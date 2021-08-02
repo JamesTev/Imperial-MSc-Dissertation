@@ -1,0 +1,46 @@
+\chapter{Introduction}
+
+\graphicspath{ {report/Chapter1/assets/} } 
+
+\section{Project Overview}
+
+The core objective of this MSc dissertation project is to assist in the development of an ultra low-cost wearable EEG (electroencephalogram) sensor prototype being developed by Imperial's NGNI (Next Generation Neural Interfaces) for demonstration at the Royal Society Summer Science Exhibition 2021. 
+
+\section{Objectives of the Study}
+To develop real time decoding and subsequent visualisation of raw analogue EEG signals acquired from proprietary EEG hardware devices developed by the NGNI lab. As these devices will be worn by up to 100 people during the Royal Society Exhibition, EEG decoding and visualisation needs to happen simultaneously to enable a virtual multiplayer game controlled by participating members of the audience.
+
+\subsection{Research questions to be investigated}
+
+\subsection{Significance of this work}
+
+\section{Scope and Constraints}
+The task of using this device at scale in a public setting imposes some unique practical constraints. These are outlined below:
+\begin{itemize}
+    \item production at scale: 100+ replicas of the EEG device need to be produced.
+    \item very tight budget of $\approx$ £20 per device.
+    \item hardware must be self-contained and so all computation should happen on the hardware. 
+    \item there is to be minimal calibration required from the user. If any, it should be done automatically.
+    \item real time decoding and feedback of signals (or as close to real time as possible).
+    \item user needs to be able to receive feedback on decoded signals - ideally visually.
+    \item device should be unobtrusive and cannot use `wet' electrodes that would hamper the user experience.
+\end{itemize}
+
+Furthermore, the EEG hardware in development is based on the low-cost Espressif ESP32 SoC based on the Tensilica Xtensa LX6 MCU. Features that are relevant to this specific project include: 
+\begin{itemize}
+    \item dual-core, 240MHz CPU
+    \item onboard FPU
+    \item up to 600 DMIPS performance
+    \item ultra low-power (ULP) co-processor
+    \item 4 MiB SRAM
+    \item integrated WiFi 802.11 b/g/n and BLE
+\end{itemize}
+Fortunately, the ESP32 SoC is extremely capable for its low cost (less than £5) and should be sufficient to handle on board computation for DSP and decoding provided that it is implemented efficiently. Its dual-core feature is also particularly useful as it will allow computation and networking to run concurrently. 
+
+\subsection{Constraint implications}
+The constraints listed above have substantial implications on my project. One of the largest constraints is the budget of £20; entry level consumer-grade BCIs (brain computer interfaces) typically cost in the region of $\$100-\$1000$. As a result, our device will only have \textbf{two active EEG channels}. Although most BCIs have many more active channels, many studies have shown that a viable decoding system can be achieved with only a limited number of channels \cite{Wang2011}, some with even as few as 2 \cite{Acampora2021}. 
+
+The prohibition of wet electrodes is also significant. Wet electrodes are known to significantly improve the quality\footnote{by reducing contact impedance} of the electrical connection to the scalp which would invariably improve SNR. 
+
+The number of samples required for adequate frequency resolution is an important consideration. Initial analysis in the experiments outlined below showed that around 5 seconds worth of sampling at 256Hz was required to achieve adequate frequency resolution. Consequently, computation time is unlikely to be the limiting factor in achieving real time decoding.
+
+\section{Plan of Development}
