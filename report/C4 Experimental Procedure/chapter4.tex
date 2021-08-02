@@ -5,6 +5,16 @@
 
 \section{Apparatus}
 \subsection{Embedded electronics}
+Espressif ESP32 SoC: features that are relevant to this specific project include: 
+\begin{itemize}
+    \item dual-core, 240MHz CPU
+    \item onboard FPU
+    \item up to 600 DMIPS performance
+    \item ultra low-power (ULP) co-processor
+    \item 4 MiB SRAM
+    \item integrated WiFi 802.11 b/g/n and BLE
+\end{itemize}
+Fortunately, the ESP32 SoC is extremely capable for its low cost (less than £5) and should be sufficient to handle on board computation for DSP and decoding provided that it is implemented efficiently. Its dual-core feature is also particularly useful as it will allow computation and networking to run concurrently. 
 \subsection{EEG sensor hardware}
 
 \section{Experimental Procedure}

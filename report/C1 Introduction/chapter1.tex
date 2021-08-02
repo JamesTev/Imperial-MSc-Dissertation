@@ -4,14 +4,33 @@
 
 \section{Project Overview}
 
-The core objective of this MSc dissertation project is to assist in the development of an ultra low-cost wearable EEG (electroencephalogram) sensor prototype being developed by Imperial's NGNI (Next Generation Neural Interfaces) for demonstration at the Royal Society Summer Science Exhibition 2021. 
+The core objective of this MSc dissertation project is to assist in the development of an ultra low-cost wearable EEG (electroencephalogram) sensor prototype being developed by the NGNI (Next Generation Neural Interfaces) Lab at Imperial College London.
 
 \section{Objectives of the Study}
-To develop real time decoding and subsequent visualisation of raw analogue EEG signals acquired from proprietary EEG hardware devices developed by the NGNI lab. As these devices will be worn by up to 100 people during the Royal Society Exhibition, EEG decoding and visualisation needs to happen simultaneously to enable a virtual multiplayer game controlled by participating members of the audience.
+The core objective of this study is to develop real time decoding and communication of raw analogue EEG signals acquired from a proprietary EEG hardware device developed by the NGNI lab. As these devices will be worn by up to 100 people during a public demonstration, decoding, communication and visualisation needs to happen simultaneously to enable a virtual multiplayer game controlled by participating members of the audience. Specific objectives of this project are outlined below:
+
+\begin{enumerate}
+    \item Review the literature pertaining to EEG signal acquisition and decoding. Perform a brief survey of common EEG paradigms and decide on a particular paradigm for further investigation based on a clear rationale. 
+    \item Review decoding techniques and algorithms for the selected EEG paradigm. Record the most effective algorithms as specified in the literature, as well as their analytical derivations in preparation for implementation. 
+    \item Scope firmware most suitable for the microcontroller used in the EEG hardware supplied by the NGNI Lab
+    \item Design and implement embedded software required to sample EEG signals and perform online decoding thereof using previously identified decoding algorithms.
+    \item Determine the optimal network protocol and structure to communicate decoded data and any other pertinent device-specific information to a cloud service.
+    \item Devise testing mechanisms to verify the validity of obtained results, including significance tests to demonstrate non-trivial decoding skill.
+    \item Critically evaluate the performance of the system, both with reference to the objectives of this study and the performance of the most comparable commercially-available system.
+    \item Provide a discussion of results obtained and provide reasons for any shortcomings or anomalies. Provide suggestions for further improvement.
+    
+\end{enumerate}
 
 \subsection{Research questions to be investigated}
-
+This project aims to address the following core research questions: 
+\begin{itemize}
+    \item Can an ultra low-cost (in the region of £20) device be used to \textit{reliably} decode EEG signals of interest in real time? For a minimum case of reliability, there should be quantifiable measure of significance that demonstrates that events/signals of interest can be decoded beyond just pure chance. 
+    \item If so, can such a device perform all computation necessary for signal decoding on-device (without the need to outsource computation to the cloud or end client, for example)? 
+\end{itemize}
 \subsection{Significance of this work}
+If able to fulfil its aforementioned objectives, this device would serve as a significant proof-of-concept system in the area of EEG signal analysis. Importantly, as specified by the constraints below, this device is to be built using low cost, easily accessible components. Commercial EEG devices are typically priced from several hundred GBP and upwards [REF NEEDED]. Very few, if any, devices are available for less than £100. Therefore, while likely slightly less capable than the aforementioned commercial counterparts, the device investigated in this project could pose an interesting low-cost option for large scale EEG data acquisition, testing and experimentation. Furthermore, it could become a valuable pedagogical tool for educating young learners about basic neurophysiology; a field that would otherwise be difficult to access below a tertiary education level.
+
+** Provide a reference that demonstrates the demand for and/or usefulness of these devices. Need to show why having a device like this would actually be significant.
 
 \section{Scope and Constraints}
 The task of using this device at scale in a public setting imposes some unique practical constraints. These are outlined below:
@@ -25,16 +44,7 @@ The task of using this device at scale in a public setting imposes some unique p
     \item device should be unobtrusive and cannot use `wet' electrodes that would hamper the user experience.
 \end{itemize}
 
-Furthermore, the EEG hardware in development is based on the low-cost Espressif ESP32 SoC based on the Tensilica Xtensa LX6 MCU. Features that are relevant to this specific project include: 
-\begin{itemize}
-    \item dual-core, 240MHz CPU
-    \item onboard FPU
-    \item up to 600 DMIPS performance
-    \item ultra low-power (ULP) co-processor
-    \item 4 MiB SRAM
-    \item integrated WiFi 802.11 b/g/n and BLE
-\end{itemize}
-Fortunately, the ESP32 SoC is extremely capable for its low cost (less than £5) and should be sufficient to handle on board computation for DSP and decoding provided that it is implemented efficiently. Its dual-core feature is also particularly useful as it will allow computation and networking to run concurrently. 
+Furthermore, the EEG hardware in development is based on the low-cost Espressif ESP32 SoC based on the Tensilica Xtensa LX6 MCU. 
 
 \subsection{Constraint implications}
 The constraints listed above have substantial implications on my project. One of the largest constraints is the budget of £20; entry level consumer-grade BCIs (brain computer interfaces) typically cost in the region of $\$100-\$1000$. As a result, our device will only have \textbf{two active EEG channels}. Although most BCIs have many more active channels, many studies have shown that a viable decoding system can be achieved with only a limited number of channels \cite{Wang2011}, some with even as few as 2 \cite{Acampora2021}. 
