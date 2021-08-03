@@ -59,8 +59,14 @@ Electrodes are most commonly arranged on the scalp according to the Internationa
     \label{fig:10-20-positions}
 \end{figure}
 
-\subsection{EEG Paradigms}
-As alluded to before, one of the objectives for the Royal Society Exhibition is to create a multiplayer game that receives control signals from participants in the audience wearing our EEG devices. Thus, one of the responsibilities of this project is to decide on the specific EEG paradigm that will be used to capture user input. It should be noted that the feasibility of various paradigms largely depends on the quality of the available signals and that of the decoding pipeline which are yet to be conclusively determined. Several studies suggest that \textbf{steady-state visual evoked potentials} \cite{Fernandez-Fraga2016}\cite{Kanoga2020}\cite{Acampora2021} (SSVEPs) offer significant potential for EEG decoding tasks similar to this project due to the high information transfer rate (ITR), non-invasiveness and relatively high SNR that can be achieved using basic BCI devices \cite{Zhu2021}. 
+\subsection{BCI control signals}
+
+\subsubsection{Visual evoked potentials}
+\subsubsection{Slow cortical potentials}
+\subsubsection{P300 evoked potentials}
+\subsubsection{Sensorimotor rhythms}
+
+Several studies suggest that \textbf{steady-state visual evoked potentials} \cite{Fernandez-Fraga2016}\cite{Kanoga2020}\cite{Acampora2021} (SSVEPs) offer significant potential for EEG decoding tasks similar to this project due to the high information transfer rate (ITR), non-invasiveness and relatively high SNR that can be achieved using basic BCI devices \cite{Zhu2021}. 
 
 \subsection{Steady-state visual evoked potentials (SSVEP)}
 An SSVEP signal is most commonly observed as the brain's response to a visual stimulus flickering at constant frequency \cite{Xie2016}. Specifically, the fundamental SSVEP frequency $f_{SSVEP}^{(0)}$ will match that of the stimulus in the spectrum of the resulting EEG signal (within some frequency bounds, as explored below). Stimulus frequency bands of around 8-15Hz are commonly used \cite{Acampora2021}\cite{Chen2017}, however, Xie et al showed successful decoding with 27.8Hz \cite{Xie2016}. SSVEPs are produced in the brain's visual cortex and are usually measured in the occipital and/or parietal regions \cite{Fernandez-Fraga2016}. Using the international 10-20 electrode electrode scheme, this corresponds to the $\text{PO}_x$ and $\text{O}_x$  electrodes. The current idea is that users in the exhibition will be presented a mobile-friendly, lightweight web page with 2-4 stimulus squares or other images that flicker at frequencies $f_1, \dots, f_n$. Each stimulus will correspond to an action - such as `up' or `down' - that will control an avatar in the cooperative game mentioned above. The objective is to decode $f_1, \dots, f_n$ in order to interpret a user's desired action (i.e. discern which stimulus image they are focused on).
