@@ -1,13 +1,18 @@
 \chapter{Introduction}
+\label{chapter:introduction}
 
 \graphicspath{ {report/Chapter1/assets/} } 
 
-\section{Project Overview}
+\section{Background and Motivation}
 
-The core objective of this MSc dissertation project is to assist in the development of an ultra low-cost wearable EEG (electroencephalogram) sensor prototype being developed by the NGNI (Next Generation Neural Interfaces) Lab at Imperial College London.
+A brain-computer interface (BCI), also known as brain-machine interface (BMI), is a system that allows computers or other external devices to be controlled by electroencephalographic (EEG) activity alone \cite{bci-survey-nicolas-alonso}. The most common application of BCIs is to provide a means of communication to people who have lost the means to do so in a normal capacity, typically due to injury, trauma or preexisting impairments of the neuromuscular system. Particularly in the case of fully paralysed or 'locked in' patients suffering disorders such as amyotrophic lateral sclerosis (ALS), strokes or spinal cord injuries, advances in BCI technology pose a promising means of restoring the ability to communicate with the outside world \cite{bci-wolpaw}. This is made possible by measuring and characterising (decoding) brain activity in order to translate raw EEG signals into external control commands without any neuromuscular interaction. External control targets may be in the form of computer-based spellers, speech synthesizers or neural prostheses \cite{bci-survey-nicolas-alonso}. 
+
+A challenge with existing BCI technologies is their cost which, in many cases, prohibits their use on a mass scale. In this project, a novel, ultra low-cost\footnote{In the region of 10 to 20 times less expensive than the cheapest comparable commercial model} EEG-based BCI system will be created in order to investigate the viability of acquiring and decoding EEG activity from an audience of 100 people simultaneously. 
+
+While the initial demonstration will be performed on healthy individuals, its success will provide great promise for facilitating large scale interaction and communication between people with neuromuscular impairments such as those mentioned above.  
 
 \section{Objectives of the Study}
-The core objective of this study is to develop real time decoding and communication of raw analogue EEG signals acquired from a proprietary EEG hardware device developed by the NGNI lab. As these devices will be worn by up to 100 people during a public demonstration, decoding, communication and visualisation needs to happen simultaneously to enable a virtual multiplayer game controlled by participating members of the audience. Specific objectives of this project are outlined below:
+The core focus of this study is to develop real time decoding and communication of raw analogue EEG signals acquired from a proprietary EEG hardware device developed by the NGNI lab. These devices will be worn by up to 100 people and will be used to facilitate collaborative control in a multiplayer game. Consequently, decoding, communication and visualisation needs to happen in real time and simultaneously between devices. Specific objectives of this project are outlined below:
 
 \begin{enumerate}
     \item Review the literature pertaining to EEG signal acquisition and decoding. Perform a brief survey of common EEG paradigms and decide on a particular paradigm for further investigation based on a clear rationale. 
@@ -54,3 +59,12 @@ The prohibition of wet electrodes is also significant. Wet electrodes are known 
 The number of samples required for adequate frequency resolution is an important consideration. Initial analysis in the experiments outlined below showed that around 5 seconds worth of sampling at 256Hz was required to achieve adequate frequency resolution. Consequently, computation time is unlikely to be the limiting factor in achieving real time decoding.
 
 \section{Plan of Development}
+This report begins with a review of the basics of neurophysiology and how electrical signals are used by the human brain. An overview of the mechanics of electroencephalography (EEG) is presented, followed by some of the popular EEG paradigms explored in the literature. A particular paradigm is selected for further analysis. The current state-of-the-art in EEG signal decoding for the selected EEG paradigm is explored both from a technological and theoretical perspective. 
+
+Chapter \ref{chapter:theory-development} expands on the theory of decoding algorithms that are most applicable to this project. This theory expansion is vital as it lends a far easier understanding of the final implementation in software. Various computational approaches are explored and their advantages and disadvantages analysed. 
+
+Chapter \ref{chapter:system-design} explores the design of the embedded software required to execute the decoding algorithms introduced in the previous chapter. Auxiliary components, such as networking and communication infrastructure, are also explored. Computational challenges and the evolution of their solutions are presented. 
+
+Results of the implemented decoding system are provided in Chapter \ref{chapter:results}. Results obtained in various scenarios are documented, including decoding performance using: publicly available data benchmark data, data gathered using a low level commercially available OpenBCI headset and data using the final hardware prototype created as part of this project. 
+
+Finally, a discussion of the results obtained is provided in Chapter \ref{chapter:discussion-conclusion}. Conclusions are drawn and suggestions for improvement in further work are given. 
