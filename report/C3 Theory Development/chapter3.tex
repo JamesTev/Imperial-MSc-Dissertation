@@ -7,6 +7,80 @@
 \section{Theoretical Development of SSVEP Decoding Algorithms}
 
 \subsection{Canonical correlation analysis (CCA)}
+Given variable partitions $\mX \in \R^{m\times p}$, $\mY \in \R^{m\times q}$ each with $m$ observations, CCA seeks to find a linear combination of $\mX$, $\mY$ that maximises the correlation between their images. More formally, assuming that the variables (columns) of the two partitions $\vx_1, \dots, \vx_p \in \R^{m}$ and $\vy_1, \dots, \vy_q \in \R^{m}$ are standardised to have zero mean and unit variance, find
+\begin{align}
+    \rho &= \max_{\vw_X, \vw_Y} \textrm{corr}(\mX \vw_X, \mY \vw_Y) \\
+    &= \max_{\vw_X, \vw_Y} \frac{\E[\mX \vw_X\vw_Y^\top\mY^\top ]}{\sqrt{\E[\mX \vw_X\vw_X^\top\mX^\top]\E[\mY \vw_Y\vw_Y^\top\mY^\top]}}
+    \label{eq:cca-corr-objective}
+\end{align}
+where $\rho$ is the \textit{canonical correlation}, $\vw_X$ and $\vw_Y$ are the canonical weight vectors and the images $\vz_X = \mX\vw_X$ and $\vz_Y = \mY\vw_Y$ are the \textit{canonical variables} for $\mX$ and $\mY$ respectively.
+
+\subsubsection{Geometric interpretation}
+The authors in \cite{cca-tutorial} present an intuitive geometric analogy. Consider $\mX$ and $\mY$ as linear transforms of position vectors $\vw_X$ and $\vw_Y$ onto their images $\vz_X$ and $\vz_Y$ in $\R^m$. CCA constrains $\vz_X$ and $\vz_Y$ to have unit norm and that the angle $\theta \in [0, \frac{\pi}{2}]$ between them be minimised so as to maximise their correlation. The canonical correlation $\rho$ is then the inner product of $\vz_X$ and $\vz_Y$:
+\begin{equation}
+    \rho = \vz_X^\top\vz_Y = \|\vz_X\|\|\vz_Y\|\cos(\theta) = \cos(\theta)
+\end{equation}
+Therefore, CCA aims to find position vectors $\vw_X$, $\vw_Y$ that, after undergoing linear transforms $\mX$ and $\mY$, are mapped to a unit ball in $\R^m$ where $\theta$ is minimised \cite{cca-tutorial}. Note that there will be $n=\textrm{min}(p, q)$ canonical correlations $\rho_1, \dots, \rho_n$ with $|\rho_i| \geq |\rho_j|, \; \forall \; i < j$. Typically, only the first and largest canonical correlation $\rho_1$ is considered. 
+
+\subsubsection{Solving for canonical weight vectors through the eigenvalue problem}
+Consider the case of solving for the first and largest canonical correlation $p_1$. Following the geometric interpretation, the objective is to find
+\begin{equation}
+    \cos(\theta_1) = \max_{\vw_X, \vw_Y}\langle\,\vz_X,\vz_Y\rangle \quad \textrm{with} \quad \|\vz_X\| = \|\vz_Y\| = 1
+\label{eq:cca-objective-1}
+\end{equation}
+where $\theta_1$ is the smallest angle between image vectors. Defining the intra set sample covariance matrices as 
+\begin{align}
+    \mC_{XX} &= \frac{1}{m-1}\mX^\top\mX \\ 
+    \mC_{YY} &= \frac{1}{m-1}\mY^\top \mY 
+\end{align}
+and the inter set cross covariance matrix as 
+\begin{align}
+    \mC_{XY} &= \frac{1}{m-1}\mX^\top\mY,
+\end{align}
+the unit variance constraint on the image vectors can be rewritten as  \begin{align}
+\begin{split}
+    \|\vz_X\| &= \vz_X^\top\vz_X = \vw_X^\top \mX^\top \mX \vw_X =  \vw_X^\top \mC_{XX} \vw_X = 1 \\
+    \|\vz_Y\| &= \vz_Y^\top\vz_Y = \vw_Y^\top \mY^\top \mY \vw_Y =  \vw_Y^\top \mC_{YY} \vw_Y = 1 
+    \end{split}
+\label{eq:unit-variance-reformulated}
+\end{align}
+Substituting (\ref{eq:unit-variance-reformulated}) into (\ref{eq:cca-corr-objective}) yields 
+
+\begin{equation}
+\cos(\theta) = \max_{\vw_X, \vw_Y} \vw_X^\top \mC_{XY} \vw_Y 
+\end{equation}
+Lagrangian dual theory provides a straight forward way to solve the constrained optimisation problem above with unit variance constraints as in (\ref{eq:unit-variance-reformulated}). Consider the Lagrangian for this problem below with Lagrange multipliers $\lamba_1$ and $\lambda_2$:
+\begin{equation}
+    \mathcal{L}(\vw_X, \vw_Y, \lambda_1, \lambda_2) = \vw_X^\top \mC_{XY} \vw_Y - \frac{\lambda_1}{2}(\vw_X^\top \mC_{XX} \vw_X-1) - \frac{\lambda_2}{2}(\vw_Y^\top \mC_{YY} \vw_Y-1)
+\end{equation}
+With reference to the KKT conditions, stationary requires
+\begin{align}
+    \label{eq:cca-lagrange-x}
+    \frac{\partial \mathcal{L}}{\partial \vw_X} &= \mC_{XY} \vw_Y - \lambda_1\mC_{XX} \vw_X = 0 \\
+    \frac{\partial \mathcal{L}}{\partial \vw_Y} &= \mC_{YX} \vw_X - \lambda_2\mC_{YY} \vw_Y = 0
+        \label{eq:cca-lagrange-y}
+\end{align}
+Since $\mC_{YX} = \mC_{XY}^\top$. Pre-multiplying (\ref{eq:cca-lagrange-x}) by $\vw_X^\top$ and (\ref{eq:cca-lagrange-y}) by $\vw_Y^\top$ yields:
+\begin{align}
+\begin{split}
+    \vw_X^\top\mC_{XY} \vw_Y - \lambda_1\vw_X^\top\mC_{XX} \vw_X &= 0 \\
+    \vw_Y^\top\mC_{YX} \vw_X - \lambda_2\vw_Y^\top\mC_{YY} \vw_Y &= 0
+\end{split}
+\label{eq:lagrange-multi}
+\end{align}
+Since $\vw_X^\top \mC_{XX} \vw_X = \vw_Y^\top \mC_{YY} \vw_Y =1$, it is clear from (\ref{eq:lagrange-multi}) that $\lambda_1=\lambda_2 = \lambda$. Substituting this result into (\ref{eq:cca-lagrange-x}) yields
+\begin{align}
+    \vw_X = \frac{\mC_{XX}^{-1}C_{XY}\vw_Y}{\lambda}
+\end{align}
+Then, substituting into (\ref{eq:cca-lagrange-y}) produces the following generalised eigenvalue problem:
+\begin{align}
+    \mC_{YX}\mC^{-1}_{XX}\mC_{XY}\vw_{Y} = \lambda^2\mC_{YY}\vw_Y
+\end{align}
+If $\mC_{YY}$ is non-singular, this reduces to a standard eigenvalue problem of the form
+\begin{align}
+    \mC_{YY}^{-1}\mC_{YX}\mC^{-1}_{XX}\mC_{XY}\vw_{Y} = \lambda^2\vw_Y
+\end{align}
+The eigenvalues of the matrix $\mC_{YY}^{-1}\mC_{YX}\mC^{-1}_{XX}\mC_{XY}$ correspond to the squares of the canonical correlations $\rho_1, \dots, \rho_n$.
 
 \subsection{Generalised CCA (GCCA)}
 

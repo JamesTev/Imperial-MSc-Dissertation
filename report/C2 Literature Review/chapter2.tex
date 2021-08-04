@@ -122,4 +122,16 @@ Potentially list any practical findings from the literature that would influence
 \section{Computational Approaches for SSVEP Decoding}
 \subsection{Power spectral density and frequency domain}
 \subsection{Statistical}
+
+\subsubsection{Canonical Correlation Analysis (CCA)}
+CCA is a standard multivariate statistical technique for analysing multiple variables measured on a set of observations. In particular, variables are partitioned into two sets or \textit{views} of the data \cite{cca-tutorial}. Effectively, CCA is a multivariate extension of ordinary correlation. Given variable partitions $\mX \in \R^{m\times p}$, $\mY \in \R^{m\times q}$ each with $m$ observations, CCA seeks to find a linear combination of $\mX$, $\mY$ that maximises the correlation between their images. More formally, assuming that the variables (columns) of the two partitions $\vx_1, \dots, \vx_p \in \R^{m}$ and $\vy_1, \dots, \vy_q \in \R^{m}$ are standardised to have zero mean and unit variance, find
+\begin{align}
+    \rho &= \max_{\vw_X, \vw_Y} \textrm{corr}(\mX \vw_X, \mY \vw_Y) \\
+    &= \max_{\vw_X, \vw_Y} \frac{\E[\mX \vw_X\vw_Y^\top\mY^\top ]}{\sqrt{\E[\mX \vw_X\vw_X^\top\mX^\top]\E[\mY \vw_Y\vw_Y^\top\mY^\top]}}
+    \label{eq:cca-corr-objective}
+\end{align}
+where $\rho$ is the \textit{canonical correlation}, $\vw_X$ and $\vw_Y$ are the canonical weight vectors and the images $\vz_X = \mX\vw_X$ and $\vz_Y = \mY\vw_Y$ are the \textit{canonical variables} for $\mX$ and $\mY$ respectively.
+
+\subsubsection{Canonical Correlation Analysis (CCA)}
+
 \subsection{Data-driven and machine learning}
