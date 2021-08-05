@@ -95,11 +95,11 @@ Sensorimotor & \begin{tabular}[c]{@{}l@{}}Modulations in signals from the motor 
 \end{table}
 
 \section{Steady-state visual evoked potentials (SSVEP)}
-Several studies suggest that steady-state visual evoked potentials  \cite{Fernandez-Fraga2016}\cite{Kanoga2020}\cite{Acampora2021} (SSVEPs) offer significant potential for EEG decoding tasks similar to those in this project due to the high information transfer rate (ITR), non-invasiveness and relatively high SNR that can be achieved using basic BCI devices \cite{Zhu2021}. Moreover, SSVEP amplitudes change as a function of stimulus intensity (luminance and contrast) \cite{autthasan-single-chan-ssvep} which can easily be controlled. Considering these factors and the fact that SSVEP-based BCIs require little to no user training or prior BCI experience, it is clear that this is the most suitable EEG paradigm for this project. 
+Several studies suggest that steady-state visual evoked potentials  \cite{Fernandez-Fraga2016}, \cite{Kanoga2020}, \cite{Acampora2021} (SSVEPs) offer significant potential for EEG decoding tasks similar to those in this project due to the high information transfer rate (ITR), non-invasiveness and relatively high SNR that can be achieved using basic BCI devices \cite{Zhu2021}. Moreover, SSVEP amplitudes change as a function of stimulus intensity (luminance and contrast) \cite{autthasan-single-chan-ssvep} which can easily be controlled. Considering these factors and the fact that SSVEP-based BCIs require little to no user training or prior BCI experience, it is clear that this is the most suitable EEG paradigm for this project. 
 
 \subsection{Evoking and measuring SSVEPs}
 
-Broadly speaking, in order to evoke SSVEPs, flickering visual stimuli with frequencies of around 7-15Hz are commonly used \cite{Acampora2021}\cite{Chen2017}\cite{duart-comparing-ssvep-stimuli}, however, Xie et al demonstrated successful decoding with 27.8Hz \cite{Xie2016}. As in \cite{Acampora2021}, \cite{Chen2017}, \cite{autthasan-single-chan-ssvep}, visual stimuli are usually presented using a computer monitor with an LCD display or discrete LEDs. SSVEPs are measured in the occipital and/or parietal regions \cite{Fernandez-Fraga2016} for proximity to the visual cortex. Using the international 10-20 electrode electrode scheme, this corresponds to the parieto-occipital ($\text{PO}_x$) and occipital ($\text{O}_x$)  electrodes.
+Broadly speaking, in order to evoke SSVEPs, flickering visual stimuli with frequencies of around 7-15Hz are commonly used \cite{Acampora2021}, \cite{Chen2017}, \cite{duart-comparing-ssvep-stimuli}, however, Xie et al demonstrated successful decoding with 27.8Hz \cite{Xie2016}. As in \cite{Acampora2021}, \cite{Chen2017}, \cite{autthasan-single-chan-ssvep}, visual stimuli are usually presented using a computer monitor with an LCD display or discrete LEDs. SSVEPs are measured in the occipital and/or parietal regions \cite{Fernandez-Fraga2016} for proximity to the visual cortex. Using the international 10-20 electrode electrode scheme, this corresponds to the parieto-occipital ($\text{PO}_x$) and occipital ($\text{O}_x$)  electrodes.
 
 The aforementioned studies do not provide a unanimous set of parameters for the optimal SSVEP stimulus. There is substantial variation in the frequency, colour and source of stimulus used across these studies and indeed, many other studies in the literature \cite{duart-comparing-ssvep-stimuli}. Duart et al in \cite{duart-comparing-ssvep-stimuli} sought to investigate these stimulus design parameters more closely and compare their impact on accuracy of frequency discrimination and SNR (signal-to-noise ratio) in SSVEP-based BCIs. Specifically, the following parameters were tested:
 \begin{itemize}
@@ -123,15 +123,29 @@ Potentially list any practical findings from the literature that would influence
 \subsection{Power spectral density and frequency domain}
 \subsection{Statistical}
 
-\subsubsection{Canonical Correlation Analysis (CCA)}
-CCA is a standard multivariate statistical technique for analysing multiple variables measured on a set of observations. In particular, variables are partitioned into two sets or \textit{views} of the data \cite{cca-tutorial}. Effectively, CCA is a multivariate extension of ordinary correlation. Given variable partitions $\mX \in \R^{m\times p}$, $\mY \in \R^{m\times q}$ each with $m$ observations, CCA seeks to find a linear combination of $\mX$, $\mY$ that maximises the correlation between their images. More formally, assuming that the variables (columns) of the two partitions $\vx_1, \dots, \vx_p \in \R^{m}$ and $\vy_1, \dots, \vy_q \in \R^{m}$ are standardised to have zero mean and unit variance, find
-\begin{align}
-    \rho &= \max_{\vw_X, \vw_Y} \textrm{corr}(\mX \vw_X, \mY \vw_Y) \\
-    &= \max_{\vw_X, \vw_Y} \frac{\E[\mX \vw_X\vw_Y^\top\mY^\top ]}{\sqrt{\E[\mX \vw_X\vw_X^\top\mX^\top]\E[\mY \vw_Y\vw_Y^\top\mY^\top]}}
-    \label{eq:cca-corr-objective}
-\end{align}
-where $\rho$ is the \textit{canonical correlation}, $\vw_X$ and $\vw_Y$ are the canonical weight vectors and the images $\vz_X = \mX\vw_X$ and $\vz_Y = \mY\vw_Y$ are the \textit{canonical variables} for $\mX$ and $\mY$ respectively.
+\subsubsection{Canonical correlation analysis (CCA)}
+CCA is a standard multivariate statistical technique for analysing multiple variables measured on a set of observations. In particular, variables are partitioned into two sets or \textit{views} of the data \cite{cca-tutorial}. Effectively, CCA is a multivariate extension of ordinary correlation. Given variable partitions $\mX \in \R^{m\times p}$, $\mY \in \R^{m\times q}$ each with $m$ observations, CCA seeks to find a linear combination of $\mX$, $\mY$ that maximises the correlation between their images $\vz_X = \mX\vw_X$ and $\vz_Y = \mY\vw_Y$. These images are known as the \textit{canonical variables} and $\vw_X$ and $\vw_Y$ are the \textit{canonical weight vectors} that effectively act as spatial filters across signal channels.
 
-\subsubsection{Canonical Correlation Analysis (CCA)}
+With CCA for SSVEP frequency recognition tasks, $\mX \in \R^{N_s\times N_c}$ is the set of \textit{measured} EEG signals from $N_c$ channels over $N_s$ observations. The measured signals in $\mX$ must be compared with each frequency $f_k \in \mathcal{F}$, a finite set of candidate stimulus frequencies. CCA can be used to compute weighted correlations between the measured signals and each candidate frequency $f_k$ by constructing a sinusoidal reference signal set $\mY_k \in \R^{N_s \times 2N_h}$ as follows: 
+\begin{equation}
+\mY_{k}=\left(\begin{array}{c}
+\sin \left(2 \pi f_{k} t\right) \\
+\cos \left(2 \pi f_{k} t\right) \\
+\sin \left(4 \pi f_{k} t\right) \\
+\cos \left(4 \pi f_{k} t\right) \\
+\vdots \\
+\sin \left(2 \pi N_h f_{k} t\right) \\
+\cos \left(2 \pi N_h f_{k} t\right)
+\end{array}\right), \quad t=\frac{1}{f_s}, \frac{2}{f_s}, \ldots, \frac{N_s}{f_s}
+\end{equation}
+where $f_s$ is the sampling frequency and $N_h$ is the number of harmonics in the reference set, a parameter to be chosen. The scalp and other interacting layers between the brain and surface electrodes are both resistive and capacitive, producing low-pass filter dynamics \cite{baillet-em-brain-mapping}, \cite{lin-cca-2006}. Therefore, it is rare that more than $N_h=5$ harmonics are selected in the reference signal set \cite{lin-cca-2006}. The final task of frequency recognition is performed by selecting the frequency $f^*$
+\begin{equation}
+    f^* = \argmax_{f_k} \; \rho_k, \quad \forall \, f_k \in \mathcal{F}
+    \label{eq:cca-freq-discrimination}
+\end{equation}
+corresponding to the candidate frequency $f_k$ which maximises the canonical correlation $\rho_k$ between $\mX$ and the the reference set $\mY_k$. While standard CCA is a good starting point for statistical SSVEP decoding as it forms the basis of many similar algorithms, there are several extensions which have been shown to improve signal recognition performance \cite{zhang-mset-cca}, \cite{sun-gcca}, \cite{miao-hybrid-cca}. The most promising of these are explored below.
+
+\subsubsection{Multiset canonical correlation analysis (MsetCCA)}
+MsetCCA is one extension of standard CCA that takes into account historical data instead of performing inference purely on new observations. Zhang et al propose that this is one of the reasons that standard CCA performs poorly on short time windows; it effectively over fits to localised dynamics \cite{zhang-mset-cca}. Furthermore, the authors suggest that exclusively using the pre-constructed sinusoidal reference set is not optimal since this artificial reference does not exclude other features from real EEG data \cite{zhang-mset-cca}. To circumvent this, MsetCCA seeks to optimise the reference signals used in the CCA algorithm by learning multiple linear transforms to maximise overall correlation between canonical variables over \textit{many} sets of EEG data at each candidate frequency $f_k \in \mathcal{F}$ \cite{zhang-mset-cca}. This optimisation effectively finds optimal joint spatial filters $\vw_1, \dots, \vw_{N_t}$ (over $N_t$ trials) using only historical observations (`training' data). The authors claim that MsetCCA outperforms similar techniques, especially in cases with few channels and short time windows. 
 
 \subsection{Data-driven and machine learning}
