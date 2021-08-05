@@ -111,14 +111,18 @@ Duart et al found that the middle frequency of 12Hz produced maximal SNR, follow
 
 Taking into account these findings, it would appear that using stimulus frequencies of around 12Hz would be a suitable choice. Furthermore, so as to avoid using red light, white would be a good choice in medium frequency range and green would be suitable for lower frequencies around 5Hz. Using frequencies around 12Hz has the added advantage of causing less visual fatigue and theoretically, should require less active concentration from subjects in order to achieve adequate SNR.
 
-% 2.2: EEG Mechanics
-\section{EEG Signal Acquisition and Processing}
-Discuss the state-of-the-art in EEG signal acquisition and processing techniques. Discuss the mechanics of existing, commonly used devices both in industry and academia.
+\subsubsection{Electrode placement}
 
+\subsubsection{Time-frequency considerations}
+Mention typical time windows required for accurate performance and how/if sliding windows are implemented. 
 
-\subsection{Practical considerations}
-Potentially list any practical findings from the literature that would influence our design choices. For example, refresh rate of screens and the impact on consistency of flickering stimuli. Or perhaps just the hardware that was used in experiments in the literature and the importance of that (if any)
+Mention breaks between trials or any other things done between presentation of stimuli
 
+Also mention typical samplign rates and implications on number of harmonics we can include etc. 
+
+Mention typical filtering choices - e.g. bandpass + 50Hz notch
+
+% Decoding algos section
 \section{Computational Approaches for SSVEP Decoding}
 \subsection{Power spectral density and frequency domain}
 \subsection{Statistical}
@@ -147,5 +151,8 @@ corresponding to the candidate frequency $f_k$ which maximises the canonical cor
 
 \subsubsection{Multiset canonical correlation analysis (MsetCCA)}
 MsetCCA is one extension of standard CCA that takes into account historical data instead of performing inference purely on new observations. Zhang et al propose that this is one of the reasons that standard CCA performs poorly on short time windows; it effectively over fits to localised dynamics \cite{zhang-mset-cca}. Furthermore, the authors suggest that exclusively using the pre-constructed sinusoidal reference set is not optimal since this artificial reference does not exclude other features from real EEG data \cite{zhang-mset-cca}. To circumvent this, MsetCCA seeks to optimise the reference signals used in the CCA algorithm by learning multiple linear transforms to maximise overall correlation between canonical variables over \textit{many} sets of EEG data at each candidate frequency $f_k \in \mathcal{F}$ \cite{zhang-mset-cca}. This optimisation effectively finds optimal joint spatial filters $\vw_1, \dots, \vw_{N_t}$ (over $N_t$ trials) using only historical observations (`training' data). The authors claim that MsetCCA outperforms similar techniques, especially in cases with few channels and short time windows. 
+
+\subsubsection{Generalised canonical correlation analysis (GCCA)}
+Wong et al noted in their study of EEG spatial filtering methods in \cite{wong-spatial-filt} that only using historical observations to estimate spatial filters (canonical weights) $\vw_i$, as in MsetCCA, is not optimal. Using both historical data and pre-constructed sinusoidal reference signals as with standard CCA was found to enhance the algorithm's robustness and reduced calibration requirements \cite{wong-spatial-filt}.  Motivated by this, the authors in \cite{sun-gcca} developed a new algorithm called generalised CCA (GCCA) that aims to simultaneously maximise correlation between three sets of data: historical observations, measured signals in a new sample and the pre-constructed sinusoidal reference. As interpreted by the authors in \cite{sun-gcca}, the optimal spatial filters obtained through GCCA perform SSVEP signal denoising.
 
 \subsection{Data-driven and machine learning}

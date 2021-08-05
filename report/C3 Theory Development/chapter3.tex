@@ -2,7 +2,7 @@
 \chapter{Theory Development}
 \label{chapter:theory-development}
 
-\graphicspath{ {report/Chapter3/assets/} } 
+\graphicspath{ {report/C3 Theory Development/assets/} } 
 
 \section{Theoretical Development of SSVEP Decoding Algorithms}
 
@@ -129,11 +129,17 @@ Thus, $\mR$ is the inter-trial block covariance matrix which captures sub-covari
     \end{bmatrix}
 \end{align}
 
-After this training or calibration process is complete and $\mY_k$ is computed for all candidate frequencies $f_k$, these optimised reference sets can be used for inference. Given a new set of test signals $\hat{\mX} \in \R^{N_s \times N_c}$, ordinary CCA as in Section \ref{section:cca-c3} can be used to discern the frequency $f^$ corresponding to the highest canonical correlation between $\hat{\mX}$ and the associated referenced set $Y^*$. The process for finding $f^*$ is identical to that in (\ref{eq:cca-freq-discrimination}). The important difference here is how the pre-computed reference sets $\mY_k$ used in the CCA algorithm are calculated.
+After this training or calibration process is complete and $\mY_k$ is computed for all candidate frequencies $f_k$, these optimised reference sets can be used for inference. Given a new set of test signals $\hat{\mX} \in \R^{N_s \times N_c}$, ordinary CCA as in Section \ref{section:cca-c3} can be used to discern the frequency $f^$ corresponding to the highest canonical correlation between $\hat{\mX}$ and the associated referenced set $\mY^*$. The process for finding $f^*$ is identical to that in (\ref{eq:cca-freq-discrimination}). The important difference here is how the pre-computed reference sets $\mY_k$ used in the CCA algorithm are calculated.
 
 \subsection{Generalised CCA (GCCA)}
 
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.55\textwidth]{gcca}
+    \caption[Overview of the generalised CCA (GCCA) algorithm]{Diagram of the GCCA algorithm for SSVEP signal recognition. Extracted from \cite{sun-gcca}.}
+    \label{fig:gcca}
+\end{figure}
 
 \subsection{Task-related component analysis (TRCA)}
 
