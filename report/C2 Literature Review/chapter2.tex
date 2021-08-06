@@ -141,6 +141,7 @@ With CCA for SSVEP frequency recognition tasks, $\mX \in \R^{N_s\times N_c}$ is 
 \sin \left(2 \pi N_h f_{k} t\right) \\
 \cos \left(2 \pi N_h f_{k} t\right)
 \end{array}\right), \quad t=\frac{1}{f_s}, \frac{2}{f_s}, \ldots, \frac{N_s}{f_s}
+\label{eq:sinusoidal-ref}
 \end{equation}
 where $f_s$ is the sampling frequency and $N_h$ is the number of harmonics in the reference set, a parameter to be chosen. The scalp and other interacting layers between the brain and surface electrodes are both resistive and capacitive, producing low-pass filter dynamics \cite{baillet-em-brain-mapping}, \cite{lin-cca-2006}. Therefore, it is rare that more than $N_h=5$ harmonics are selected in the reference signal set \cite{lin-cca-2006}. The final task of frequency recognition is performed by selecting the frequency $f^*$
 \begin{equation}
@@ -148,6 +149,43 @@ where $f_s$ is the sampling frequency and $N_h$ is the number of harmonics in th
     \label{eq:cca-freq-discrimination}
 \end{equation}
 corresponding to the candidate frequency $f_k$ which maximises the canonical correlation $\rho_k$ between $\mX$ and the the reference set $\mY_k$. While standard CCA is a good starting point for statistical SSVEP decoding as it forms the basis of many similar algorithms, there are several extensions which have been shown to improve signal recognition performance \cite{zhang-mset-cca}, \cite{sun-gcca}, \cite{miao-hybrid-cca}. The most promising of these are explored below.
+
+\subsubsection{Task-related component analysis (TRCA)}
+\label{section:trca-c2}
+Task-related component analysis (TRCA) as a decoding technique in biophysical systems was introduced in the seminal paper by Tanaka et al \cite{tanaka-trca}. TRCA seeks to extract task-related signal components (as opposed to spurious, unwanted components such as EMG artefacts and background noise) by identifying components that lead to maximum reproducibility across trials. Task-related components are constructed as linear combinations of signals recorded across multiple time blocks (trials) and their weights are optimised so as to maximise their inter-block correlation or covariance \cite{tanaka-trca}. Components with maximum inter-block covariance and thus, reproducibility or consistency, are identified as task-related components (subject to certain significance measures as discussed later). Further advantages of TRCA are that, unlike other more common generalised linear models (GLMs), it assumes no \textit{a priori} knowledge of source signals and is not sensitive to autocorrelation \cite{tanaka-trca}. It also offers concrete measures of task-relatedness unlike some other data-driven methods like independent component analysis.
+
+To illustrate the basic idea of this algorithm, \cite{tanaka-trca} presents a useful toy example. Consider a task-related signal $s(t)$ standardised to have zero mean and unit variance embedded in additive white (uncorrelated) noise $n(t)$: $x(t) = a_1s(t) + a_2n(t)$ with some mixing scalars $a_i \in \R$. Then, assume the observable signal $x(t)$ is measured over two distinct blocks or trials to yield $x_1(t)$ and $x_2(t)$. A linear model of the two observed blocks could be defined as follows:
+\begin{align}
+    x_1(t) = a_{11}s(t) + a_{12}n(t) \\
+    x_2(t) = a_{21}s(t) + a_{22}n(t) \\
+\end{align}
+As mentioned above, TRCA attempts to recover task related components (only $s(t)$ in this case) from a linear combination of observations across trials. Defining this weighted sum as $y(t)$ with 
+\begin{equation}
+    y(t)= y_1(t) + y_2(t) = w_{1} x_{1}(t)+w_{2} x_{2}(t)=\left(w_{1} a_{11}+w_{2} a_{21}\right) s(t)+\left(w_{1} a_{12}+w_{2} a_{22}\right) n(t)
+\end{equation}
+Recovering $s(t)$ involves maximising the covariance between $y_1(t)$ and $y_2(t)$:
+\begin{align}
+\begin{split}
+\operatorname{Cov}\left(y_1, y_2\right)=&\left(w_{1} a_{11}+w_{2} a_{21}\right)^{2} \operatorname{Cov}\left(s_1, s_2\right)
++\left(w_{1} a_{12}+w_{2} a_{22}\right)^{2} \operatorname{Cov}\left(n_{1}, n_2\right) \\
+&+\left(w_{1} a_{11}+w_{2} a_{21}\right)\left(w_{1} a_{12}+w_{2} a_{22}\right)\left[\operatorname{Cov}\left(s_{2}, n_2\right)\right
+\left.+\operatorname{Cov}\left(n_{1}, s_2\right)\right]
+\end{split}
+\\
+\notag
+=&\left(w_{1} a_{11}+w_{2} a_{21}\right)^{2} \operatorname{Cov}\left(s_{1}, s_2\right)
+\end{align}
+Since $\operatorname{Cov}(n_1, n_2) = \operatorname{Cov}(s_1, n_2) = \operatorname{Cov}(n_1, s_2) = 0$. In order to bound this quadratic objective, we choose the weights $w_1, w_2$ so that the variance of $y$ is constrained to 1:
+\begin{equation}
+    \operatorname{var}(y)=\left(w_{1} a_{11}+w_{2} a_{21}\right)^{2}+\left(w_{1} a_{12}+w_{2} a_{22}\right)^{2}=1
+\end{equation}
+where $s(t)$ and $n(t)$ are also assumed to be uncorrelated $\forall t$. The solution of this constrained optimisation problem is 
+\begin{equation}
+    w_{1} a_{11}+w_{2} a_{21} = 1, \quad w_{1} a_{12}+w_{2} a_{22} = 0, 
+\end{equation}
+which, barring the unlikely case that $a_{11}a_{22} = a_{12}a_{21}$, yields $y(t)=s(t)$ as desired. This demonstrates how inter-trial covariance maximisation can be used for recovery of task-related signals.
+
+Although TRCA has been shown to outperform CCA \cite{lee-trca-2step}, \cite{miao-hybrid-cca}, \cite{sun-gcca}, extended and hybrid forms of these algorithms have produced superior results. Some of these extensions are explored below.
 
 \subsubsection{Multiset canonical correlation analysis (MsetCCA)}
 MsetCCA is one extension of standard CCA that takes into account historical data instead of performing inference purely on new observations. Zhang et al propose that this is one of the reasons that standard CCA performs poorly on short time windows; it effectively over fits to localised dynamics \cite{zhang-mset-cca}. Furthermore, the authors suggest that exclusively using the pre-constructed sinusoidal reference set is not optimal since this artificial reference does not exclude other features from real EEG data \cite{zhang-mset-cca}. To circumvent this, MsetCCA seeks to optimise the reference signals used in the CCA algorithm by learning multiple linear transforms to maximise overall correlation between canonical variables over \textit{many} sets of EEG data at each candidate frequency $f_k \in \mathcal{F}$ \cite{zhang-mset-cca}. This optimisation effectively finds optimal joint spatial filters $\vw_1, \dots, \vw_{N_t}$ (over $N_t$ trials) using only historical observations (`training' data). The authors claim that MsetCCA outperforms similar techniques, especially in cases with few channels and short time windows. 

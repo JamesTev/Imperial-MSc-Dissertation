@@ -34,7 +34,7 @@ where $\theta_1$ is the smallest angle between image vectors. Defining the withi
     \mC_{XX} = \mX^\top\mX \quad \textrm{and} \quad
     \mC_{YY} = \mY^\top \mY 
 \end{align}
-and the inter set cross covariance matrix as 
+and the inter-set cross covariance matrix as 
 \begin{align}
     \mC_{XY} &= \mX^\top\mY,
 \end{align}
@@ -50,7 +50,7 @@ Substituting (\ref{eq:unit-variance-reformulated}) into (\ref{eq:cca-corr-object
 \begin{equation}
 \cos(\theta) = \max_{\vw_X, \vw_Y} \vw_X^\top \mC_{XY} \vw_Y 
 \end{equation}
-Lagrangian dual theory provides a straight forward way to solve the constrained optimisation problem above with unit variance constraints as in (\ref{eq:unit-variance-reformulated}). Consider the Lagrangian for this problem below with Lagrange multipliers $\lamba_1$ and $\lambda_2$:
+Lagrangian dual theory provides a straight forward way to solve the constrained optimisation problem above with unit variance constraints as in (\ref{eq:unit-variance-reformulated}). Consider the Lagrangian for this problem below with Lagrange multipliers $\lambda_1$ and $\lambda_2$:
 \begin{equation}
     \mathcal{L}(\vw_X, \vw_Y, \lambda_1, \lambda_2) = \vw_X^\top \mC_{XY} \vw_Y - \frac{\lambda_1}{2}(\vw_X^\top \mC_{XX} \vw_X-1) - \frac{\lambda_2}{2}(\vw_Y^\top \mC_{YY} \vw_Y-1)
 \end{equation}
@@ -82,6 +82,27 @@ If $\mC_{YY}$ is non-singular, this reduces to a standard eigenvalue problem of 
     \mC_{YY}^{-1}\mC_{YX}\mC^{-1}_{XX}\mC_{XY}\vw_{Y} = \lambda^2\vw_Y
 \end{align}
 The eigenvalues of the matrix $\mC_{YY}^{-1}\mC_{YX}\mC^{-1}_{XX}\mC_{XY}$ correspond to the squares of the canonical correlations $\rho_1, \dots, \rho_n$.
+
+\subsection{Task-related component analysis (TRCA)}
+Expanding from the toy example in Section \ref{section:trca-c2}, the TRCA algorithm implicitly assumes that observed signals are generated as a linear combination of task-related and task-unrelated components which implies that task-related components can be recovered by applying an appropriate weighting of observed signals across trials \cite{tanaka-trca}. Inter-trial covariance maximisation is the core objective that aims to extract task-related components with maximal temporal similarity across trials. 
+
+\begin{equation}
+    \widehat{\mC}_{k l}=\operatorname{Cov}\left(\vy^{(k)}, \vy^{(l)}\right)=\sum_{i, \, j=1}^{N} w_{i} w_{j} \operatorname{Cov}\left(\vx_{i}^{(k)}, \vx_{k}^{(l)}\right)
+\end{equation}
+
+\begin{equation}
+    \operatorname{Var}(\vy)=\sum_{i, \, j=1}^{N} w_{i} w_{j} \operatorname{Cov}\left(\vx_{i}, \vx_{j}\right)=\mathbf{w}^{\mathrm{T}} \mathbf{Q} \mathbf{w}=1
+\end{equation}
+
+\begin{aligned}
+\sum_{k, l=1}^{K} \hat{C}_{k l} &=\sum_{k \neq l}^{K} \operatorname{Cov}\left(y^{(k)}(t), y^{(l)}(t)\right) \\
+& \quad=\sum_{k, l=1}^{K \neq l} \sum_{k, l=1}^{K} \sum_{i, j=1}^{N} w_{i} w_{j} \operatorname{Cov}\left(x_{i}^{(k)}(t), x_{j}^{(l)}(t)\right)=\mathbf{w}^{\mathrm{T}} \mathbf{S w}
+\end{aligned}
+
+\begin{equation}
+    \hat{\mathbf{w}}=\underset{\mathbf{w}}{\arg \max } \frac{\mathbf{w}^{T} \mathbf{S w}}{\mathbf{w}^{T} \mathbf{Q} \mathbf{w}}
+\label{eq:trca-rayleigh-ritz}
+\end{equation}
 
 \subsection{Multiset CCA (MsetCCA)}
 MsetCCA is an extension of standard CCA to multiple data sets or partitions. Accordingly, the objective is now to maximise the correlation between canonical variables from \textit{many sets} of observations at a given stimulus frequency $f_k$. MsetCCA extends the signal matrix $\mX\in \R^{N_s \times N_c}$ to a third order signal tensor $\tX \in \R^{N_s \times N_c \times N_t}$ with $N_t$ trials, each with $N_c$ channels\footnote{the constraint that the number of variables (width of $\mX_i$) for each trial be constant is not strictly necessary. For this application, however, it is assumed that the number of channels will not change between trials of a given experiment.} and $N_s$ samples. Although several objective functions for MsetCCA exist, the MAXVAR objective is explored in \cite{zhang-mset-cca} for its intuitive extension to ordinary CCA with multiple variable sets. Assuming all sets of variables in $\tX$ are normalised to have zero mean and unit variance, the MAXVAR objective for maximising correlation over canonical variables from multiple sets at a given candidate frequency $f_k$ is defined as follows:
@@ -129,19 +150,70 @@ Thus, $\mR$ is the inter-trial block covariance matrix which captures sub-covari
     \end{bmatrix}
 \end{align}
 
-After this training or calibration process is complete and $\mY_k$ is computed for all candidate frequencies $f_k$, these optimised reference sets can be used for inference. Given a new set of test signals $\hat{\mX} \in \R^{N_s \times N_c}$, ordinary CCA as in Section \ref{section:cca-c3} can be used to discern the frequency $f^$ corresponding to the highest canonical correlation between $\hat{\mX}$ and the associated referenced set $\mY^*$. The process for finding $f^*$ is identical to that in (\ref{eq:cca-freq-discrimination}). The important difference here is how the pre-computed reference sets $\mY_k$ used in the CCA algorithm are calculated.
+After this training or calibration process is complete and $\mY_k$ is computed for all candidate frequencies $f_k$, these optimised reference sets can be used for inference. Given a new set of test signals $\hat{\mX} \in \R^{N_s \times N_c}$, ordinary CCA as in Section \ref{section:cca-c3} can be used to discern the frequency $f^*$ corresponding to the highest canonical correlation between $\hat{\mX}$ and the associated referenced set $\mY^*$. The process for finding $f^*$ is identical to that in (\ref{eq:cca-freq-discrimination}). The important difference here is how the pre-computed reference sets $\mY_k$ used in the CCA algorithm are calculated.
 
 \subsection{Generalised CCA (GCCA)}
+Consider a single candidate frequency $f_k$: for the rest of this subsection, the $k$ index is ommitted for brevity but all symbols refer to those specific to the single set of trials for $f_k$. As with MsetCCA, GCCA requires a signal tensor $\tX \in \R^{N_s \times N_c \times N_t}$ that incorporates several trials. The \textit{template matrix} $\overline{\mX}$ is obtained by computing the arithmetic mean of all trials in the set: $\overline{\mX}= \frac{1}{N_t}\sum_{i=1}^{N_t}\tX_{i}$. The concatenated signal matrix $\mX^{c}$ is formed by unrolling $\tX$ along the third (trial) axis:
+\begin{equation}
+    \mX^{c} = \begin{bmatrix}
+    \mX_1^\top & \mX_2^\top & \dots & \mX_{N_t}^\top
+    \end{bmatrix} \in \R^{N_c \times (N_s N_t)} 
+\end{equation}
+Then, the template and sinusoidal reference matrices are concatenated similarly to match the dimensions of  
+$\mX^{c}$:
+\begin{equation}
+    \overline{\mX}^{c} = \begin{bmatrix}
+    \overline{\mX}^\top & \overline{\mX}^\top & \dots & \overline{\mX}^\top
+    \end{bmatrix} \in \R^{N_c \times (N_s N_t)} \quad \textrm{and} \quad  \mY^{c} = \begin{bmatrix}
+    \mY^\top & \mY^\top & \dots & \mY^\top
+    \end{bmatrix} \in \R^{2N_h \times (N_s N_t)}
+\end{equation}
+where $\mY$ follows the definition of the sinusoidal reference in (\ref{eq:sinusoidal-ref}). Consider the augmented spatial filter vector $\widetilde{\vw}$: 
+\begin{equation}
+\widetilde{\vw} = \begin{bmatrix}\vw_{\mX^{c}} & \vw_{\overline{\mX}^{c}} & \vw_{\mY^{c}} \end{bmatrix}^\top 
+\end{equation}
+Similarly, the augmented signal matrix $\widetilde{\mX}$ is defined as: 
+\begin{equation}
+\widetilde{\mX} = \begin{bmatrix}(\mX^{c})^\top & (\overline{\mX}^{c})^\top & (\mY^{c})^\top \end{bmatrix}^\top
+\end{equation}
+The objective of GCCA can then be expressed as
+\begin{align}
+\begin{split}
+    \textrm{maximise} & \quad \textrm{tr}(\widetilde{\vw}^\top\widetilde{\mX}\widetilde{\mX}^\top\widetilde{\vw}) \\
+    \textrm{s.t.} & \quad \widetilde{\vw}^\top\mD\widetilde{\vw} = \mI
+\end{split}
+\label{eq:gcca-objective}
+\end{align}
+where $\mD$, the within-set block covariance matrix, is defined as 
+\begin{equation}
+    \mD = \begin{bmatrix}
+    \mX^{c}(\mX^{c}})^\top & 0 & 0 \\
+    0 & \overline{\mX}^{c}(\overline{\mX}^{c})^\top & 0 \\
+    0 & 0 & \mY^{c}(\mY^{c}})^\top
+    \end{bmatrix}
+\end{equation}
+Again, using the method of Lagrange multipliers, (\ref{eq:gcca-objective}) can be reformulated as a generalised eigenvalue problem of the form
+\begin{equation}
+    \widetilde{\mX}\widetilde{\mX}^\top\widetilde{\vw} = \lambda\mD\widetilde{\vw} 
+    \label{eq:gcca-D}
+\end{equation}
+If $\mD$ is non-singular, (\ref{eq:gcca-D}) resolves to an ordinary eigenvalue problem:
+\begin{equation}
+    \mD^{-1}\widetilde{\mX}\widetilde{\mX}^\top\widetilde{\vw} = \lambda\widetilde{\vw} 
+    \label{eq:gcca-D-standard}
+\end{equation}
+Then, the eigenvector of $\mD^{-1}\widetilde{\mX}\widetilde{\mX}^\top$ corresponding to its largest eigenvalue is the optimal spatial filter $\vw^* \in \R^{2(N_c+N_h)}$. 
 
+Given a new test sample set $\hat{\mX} \in \R^{N_s\times N_c}$, two correlations are computed: first between the test data and the historical template, and then between the test data and sinusoidal reference. This can be expressed as 
+\begin{align}
+    \rho_1 &= \textrm{corr}(\hat{\mX}\vw_{\mX^{c}}, \; \overline{\mX}\vw_{\overline{\mX}^{c}}) \\
+    \rho_2 &= \textrm{corr}(\hat{\mX}\vw_{\mX^{c}}, \; \mY\vw_{\mY^{c}}) 
+\end{align}
+where Pearson's correlation is denoted by \textit{corr}. Finally, the output correlation for frequency $f_k$ is computed as a combination of $\rho_1$ and $\rho_2$:
+\begin{equation}
+    \rho = \textrm{sign}(\rho_1)\rho_1^2 + \textrm{sign}(\rho_2)\rho_2^2
+\end{equation}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.55\textwidth]{gcca}
-    \caption[Overview of the generalised CCA (GCCA) algorithm]{Diagram of the GCCA algorithm for SSVEP signal recognition. Extracted from \cite{sun-gcca}.}
-    \label{fig:gcca}
-\end{figure}
-
-\subsection{Task-related component analysis (TRCA)}
 
 \subsection{Related theory}
 \subsubsection{Significance testing}
