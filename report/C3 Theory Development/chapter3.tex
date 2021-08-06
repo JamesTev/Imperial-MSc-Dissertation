@@ -84,36 +84,48 @@ If $\mC_{YY}$ is non-singular, this reduces to a standard eigenvalue problem of 
 The eigenvalues of the matrix $\mC_{YY}^{-1}\mC_{YX}\mC^{-1}_{XX}\mC_{XY}$ correspond to the squares of the canonical correlations $\rho_1, \dots, \rho_n$.
 
 \subsection{Task-related component analysis (TRCA)}
+\label{sec:trca-c3}
 Expanding from the toy example in Section \ref{section:trca-c2}, the TRCA algorithm implicitly assumes that observed signals are generated as a linear combination of task-related and task-unrelated components which implies that task-related components can be recovered by applying an appropriate weighting of observed signals across trials \cite{tanaka-trca}. Inter-trial covariance maximisation is the core objective that aims to extract task-related components with maximal temporal similarity across trials. 
 
+Now that multiple trials are to be considered, the signal matrix $\mX\in \R^{N_s \times N_c}$ introduced in Section \ref{section:cca-c3} must be extended to a third order signal tensor $\tX \in \R^{N_s \times N_c \times N_t}$ with $N_t$ trials, each with $N_c$ channels\footnote{the constraint that the number of variables (width of $\mX_i$) for each trial be constant is not strictly necessary. For this application, however, it is assumed that the number of channels will not change between trials of a given experiment.} and $N_s$ samples. Let $\vy^{(k)}$ be the $k$-th trial (block) with $k\in\{1, 2, \dots, N_t\}$ of the signal $y(t)$ and $\vx_i^{(k)}$ be the $k$-th trial of the input signal from channel $i, \, i\in\{1, \dots, N_c\}$. Consider the covariance between all $i$ channels for two trials $k$ and $l$:
+
 \begin{equation}
-    \widehat{\mC}_{k l}=\operatorname{Cov}\left(\vy^{(k)}, \vy^{(l)}\right)=\sum_{i, \, j=1}^{N} w_{i} w_{j} \operatorname{Cov}\left(\vx_{i}^{(k)}, \vx_{k}^{(l)}\right)
+    \widehat{\mC}_{k l}=\operatorname{Cov}\left(\vy^{(k)}, \vy^{(l)}\right)=\sum_{i, \, j=1}^{N_c} w_{i} w_{j} \operatorname{Cov}\left(\vx_{i}^{(k)}, \vx_{k}^{(l)}\right)
 \end{equation}
-
+Furthermore, as with CCA, we must impose the constraint on the designed weights such that the variance of $y(t)$ is bounded:
 \begin{equation}
-    \operatorname{Var}(\vy)=\sum_{i, \, j=1}^{N} w_{i} w_{j} \operatorname{Cov}\left(\vx_{i}, \vx_{j}\right)=\mathbf{w}^{\mathrm{T}} \mathbf{Q} \mathbf{w}=1
+    \operatorname{Var}(\vy)=\sum_{i, \, j=1}^{N_c} w_{i} w_{j} \operatorname{Cov}\left(\vx_{i}, \vx_{j}\right)=\mathbf{w}^{\mathrm{T}} \mQ \mathbf{w}=1
 \end{equation}
-
-\begin{aligned}
-\sum_{k, l=1}^{K} \hat{C}_{k l} &=\sum_{k \neq l}^{K} \operatorname{Cov}\left(y^{(k)}(t), y^{(l)}(t)\right) \\
-& \quad=\sum_{k, l=1}^{K \neq l} \sum_{k, l=1}^{K} \sum_{i, j=1}^{N} w_{i} w_{j} \operatorname{Cov}\left(x_{i}^{(k)}(t), x_{j}^{(l)}(t)\right)=\mathbf{w}^{\mathrm{T}} \mathbf{S w}
-\end{aligned}
+Then, all possible combinations of trials $1, \dots, N_t$ are summed as
+\begin{align}
+\begin{split}
+\sum_{\substack{k, \, l=1, \\ k\neq l}}^{N_t} \widehat{\mC}_{k l} &=\sum_{\substack{k, \, l=1, \\ k\neq l}}^{N_t} \operatorname{Cov}\left(\vy^{(k)}, \vy^{(l)}\right) \\
+& =\sum_{\substack{k, \, l=1, \\ k\neq l}}^{N_t} \sum_{i, j=1}^{N_c} w_{i} w_{j} \operatorname{Cov}\left(\vx_{i}^{(k)}, \vx_{j}^{(l)}\right)= \vw^\top \mS \vw
+\end{split}
+\label{eq:trca-cov-sum}
+\end{align}
+where $\mS$ is the following symmetric matrix
+\begin{equation}
+    \mS_{i, j} = \sum_{\substack{k, \, l=1, \\ k\neq l}}^{N_t} \operatorname{Cov}\left(\vx_{i}^{(k)}, \vx_{j}^{(l)}\right)
+\end{equation}
+As alluded to before, (\ref{eq:trca-cov-sum}) yields the sum of covariances of all combinations of trials: a measure of task consistency. This is precisely what we want to maximise. This constrained optimisation problem (recalling the variance constraint on $y(t)$) can be reformulated as a Rayleigh-Ritz eigenvalue problem of the form 
 
 \begin{equation}
-    \hat{\mathbf{w}}=\underset{\mathbf{w}}{\arg \max } \frac{\mathbf{w}^{T} \mathbf{S w}}{\mathbf{w}^{T} \mathbf{Q} \mathbf{w}}
+    \vw^*=\underset{\vw}{\arg \max } \frac{\vw^\top \mS \vw}{\vw^\top \mQ \vw}
 \label{eq:trca-rayleigh-ritz}
 \end{equation}
+The inter-trial weight vectors $\vw_k, \, k \in \{1, \dots, N_t\}$ can be found by computing the eigenvectors of $\mQ^{-1}\mS$. Specifically, the degree of task-relatedness corresponds to the magnitude of the eigenvalues of $\mQ^{-1}\mS$ and so the optimal weight $\vw^*$ corresponds to the largest eigenvalue.
 
 \subsection{Multiset CCA (MsetCCA)}
-MsetCCA is an extension of standard CCA to multiple data sets or partitions. Accordingly, the objective is now to maximise the correlation between canonical variables from \textit{many sets} of observations at a given stimulus frequency $f_k$. MsetCCA extends the signal matrix $\mX\in \R^{N_s \times N_c}$ to a third order signal tensor $\tX \in \R^{N_s \times N_c \times N_t}$ with $N_t$ trials, each with $N_c$ channels\footnote{the constraint that the number of variables (width of $\mX_i$) for each trial be constant is not strictly necessary. For this application, however, it is assumed that the number of channels will not change between trials of a given experiment.} and $N_s$ samples. Although several objective functions for MsetCCA exist, the MAXVAR objective is explored in \cite{zhang-mset-cca} for its intuitive extension to ordinary CCA with multiple variable sets. Assuming all sets of variables in $\tX$ are normalised to have zero mean and unit variance, the MAXVAR objective for maximising correlation over canonical variables from multiple sets at a given candidate frequency $f_k$ is defined as follows:
+MsetCCA is an extension of standard CCA to multiple data sets or partitions. Accordingly, the objective is now to maximise the correlation between canonical variables from \textit{many sets} of observations at a given stimulus frequency $f_k$. Although several objective functions for MsetCCA exist, the MAXVAR objective is explored in \cite{zhang-mset-cca} for its intuitive extension to ordinary CCA with multiple variable sets. Assuming all sets of variables in $\tX$ are normalised to have zero mean and unit variance, the MAXVAR objective for maximising correlation over canonical variables from multiple sets at a given candidate frequency $f_k$ is defined as follows:
 \begin{align}
 \begin{split}
 \max_{\mathbf{w}_{1}, \ldots, \mathbf{w}_{N_t}} & \quad \rho=\sum_{i \neq j}^{N_t} \mathbf{w}_{i}^\top\mX_{i}^\top \mX_{j}\mathbf{w}_{j} \\
-\text { s.t. } & \quad \frac{1}{N_t} \sum_{i=1}^{N_t} \mathbf{w}_{i}^\top\mX_{i}^\top \mX_{i}\mathbf{w}_{i}=1
+\text { s.t. } & \quad \frac{1}{N_t} \sum_{i=1}^{N_t} \mathbf{w}_{i}^\top\mX_{i}^\top \mX_{i}\mathbf{w}_{i}=1,
 \end{split}
 \label{eq:mset-cca-objective}
 \end{align}
-Following a similar approach as in the derivation for CCA above, the method of Lagrange multipliers can be used to transform the constrained optimisation problem in (\ref{eq:mset-cca-objective}) to a generalised eigenvalue problem of the form:
+where the same conventions for the signal tensor $\tX$ as in Section \ref{sec:trca-c3} above apply. Following a similar approach as in the derivation for CCA above, the method of Lagrange multipliers can be used to transform the constrained optimisation problem in (\ref{eq:mset-cca-objective}) to a generalised eigenvalue problem of the form:
 \begin{equation}
         (\mR -\mS)\vw = \rho\mS \vw
 \label{eq:mset-cca-gen-eig}
