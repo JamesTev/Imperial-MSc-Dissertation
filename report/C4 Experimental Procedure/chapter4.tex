@@ -55,9 +55,13 @@ As alluded to in Chapter \ref{chapter:introduction}, the hardware to be used in 
     \item 4 MiB SRAM
     \item integrated Wi-Fi 802.11 b/g/n and BLE
 \end{itemize}
-The ESP32 is extremely capable for its low price tag of around 3.6 USD \cite{esp32-digikey}. Its dual-core CPU is also particularly attractive as it could allow decoding-related computation and network communication to happen concurrently. 
+The ESP32 is extremely capable for its low price tag of around 3.6 USD \cite{esp32-digikey}. Its dual-core CPU is also particularly attractive as it could allow decoding-related computation and network communication to happen concurrently.
 
-\begin{figure}
+Figure \ref{fig:esp-hardware} shows the electronic hardware prototype developed by the NGNI Lab. In this design, the active components directly involved in the normal functioning of the system are independently located on a `target' board. A second programmer board was created to enable serial communication with the target; most commonly in order to flash new firmware to it during development. The programmer board uses six spring-loaded pogo pins to make momentary contact with corresponding pads on the target board during development. These 6 pins, and their corresponding pads on the target board, can be seen directly in the centre of Figure \ref{fig:esp-hardware-both}. A 3D printed housing was created to facilitate correct contact between the boards during development. As depicted in the image of the programmer board in Figure \ref{fig:esp-hardware-programmer}, it also features contact points for probing a few selected pins/junctions on the target board such as: the ADC output, the inverting pin of the analogue amplifier, the output of the analogue filter and all relevant supply voltage references. In addition, two momentary push-buttons connected to the \texttt{BOOT0} and \texttt{EN} pins of the ESP32 SoC are included in order to allow hardware resets and to control the entry state upon reset: bootloader mode or normal operating mode. 
+
+It should be noted that this first revision of the electronic hardware prototype is designed for coupling with \textit{two} active electrodes but only allows for \textit{differential} signal measurements between these electrodes. A third reference electrode is also expected in order to offer a common voltage reference point between the two active channels. 
+
+\begin{figure}[!htb]
      \centering
      \begin{subfigure}[b]{0.3\textwidth}
          \centering
@@ -79,8 +83,15 @@ The ESP32 is extremely capable for its low price tag of around 3.6 USD \cite{esp
          \caption{Bottom side of the programmer board (left) and target board}
          \label{fig:esp-hardware-both}
      \end{subfigure}
-        \caption{Images of the final EEG hardware prototype developed in the Imperial NGNI Lab. This prototype includes the target board with ESP32 SoC, as well as a programmer board that is used to flash new firmware on to the microcontroller aboard the target board.}
+        \caption[Images of the electronic hardware prototype developed in the Imperial NGNI Lab]{Images of the electronic hardware prototype developed in the Imperial NGNI Lab. This prototype includes the target board with ESP32 SoC, as well as a programmer board that is used to flash new firmware on to the microcontroller aboard the target board. The orange 3D-printed housing is used to position the programmer board above the target during firmware updates or other serial communication with an external computer.}
         \label{fig:esp-hardware}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{frankenstein}
+    \caption[A very rudimentary first prototype EEG band]{The first very rudimentary prototype EEG band developed by the NGNI Lab based on the electronic hardware prototype in Figure \ref{fig:esp-hardware}. The active electrodes are those at the two extremes of the band and the middle one is a reference electrode.}
+    \label{fig:frakenstein-hardware}
 \end{figure}
 
 \subsubsection{NGNI Prototype II}
