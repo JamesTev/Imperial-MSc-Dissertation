@@ -99,6 +99,7 @@ Sensorimotor & \begin{tabular}[c]{@{}l@{}}Modulations in signals from the motor 
 Several studies suggest that steady-state visual evoked potentials  \cite{Fernandez-Fraga2016}, \cite{Kanoga2020}, \cite{Acampora2021} (SSVEPs) offer significant potential for EEG decoding tasks similar to those in this project due to the high information transfer rate (ITR), non-invasiveness and relatively high SNR that can be achieved using basic BCI devices \cite{Zhu2021}. Moreover, SSVEP amplitudes change as a function of stimulus intensity (luminance and contrast) \cite{autthasan-single-chan-ssvep} which can easily be controlled. Considering these factors and the fact that SSVEP-based BCIs require little to no user training or prior BCI experience, it is clear that this is the most suitable EEG paradigm for this project. 
 
 \subsection{Evoking and measuring SSVEPs}
+\label{subsection:evoking-measuring-ssveps}
 
 Broadly speaking, in order to evoke SSVEPs, flickering visual stimuli with frequencies of around 7-15Hz are commonly used \cite{Acampora2021}, \cite{Chen2017}, \cite{duart-comparing-ssvep-stimuli}, however, Xie et al demonstrated successful decoding with 27.8Hz \cite{Xie2016}. As in \cite{Acampora2021}, \cite{Chen2017}, \cite{autthasan-single-chan-ssvep}, visual stimuli are usually presented using a computer monitor with an LCD display or discrete LEDs. SSVEPs are measured in the occipital and/or parietal regions \cite{Fernandez-Fraga2016} for proximity to the visual cortex. Using the international 10-20 electrode electrode scheme, this corresponds to the parieto-occipital ($\text{PO}_x$) and occipital ($\text{O}_x$)  electrodes.
 
@@ -115,6 +116,7 @@ Taking into account these findings, it would appear that using stimulus frequenc
 \subsubsection{Electrode placement}
 
 \subsubsection{Time-frequency considerations}
+\label{subsection:time-frequency-considerations-c2}
 Mention typical time windows required for accurate performance and how/if sliding windows are implemented. 
 
 Mention breaks between trials or any other things done between presentation of stimuli
