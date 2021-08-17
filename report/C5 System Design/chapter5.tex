@@ -162,6 +162,7 @@ An additional important motivation for using MicroPython over the more tradition
 Being able to perform matrix and array operations, filtering and numerical approximation on a microcontroller in an elegant, Pythonic way is clearly an invaluable asset for this project. Indeed, for any project of this sort, it is somewhat amazing. Listing \ref{listing:ulab-intro} briefly demonstrates just how effortlessly complex numerical computations can be performed using \texttt{ulab}.
 
 \begin{listing}[h]
+\small
 \begin{minted}{python}
 # import ulab module
 from ulab import numpy as np
@@ -190,14 +191,16 @@ A_pinv = np.dot(np.linalg.inv(np.dot(np.transpose(A), A)), np.transpose(A))
 \end{listing}
 
 \subsection{Networking}
-Discuss AWS IoT interface and real-time streaming capabilities using MQTT
+Once processed and decoded, data from many BCI devices must be streamed to a central cloud service. The design of this cloud service was beyond the scope of this project. However, it was specified that the Amazon Web Services (AWS) IoT Core service was to be used. This service allows IoT devices to securely exchange small data payloads over the Internet using the MQTT protocol. MQTT is a lightweight, publish-subscribe protocol that has become commonplace in the realm of IoT communication. As mentioned in Section \ref{subsection:electronic-hardware-proto}, the ESP32 SoC has integrated Wi-Fi functionality. MicroPython includes generic socket functionality that can be used to implement an MQTT client for interfacing with AWS.
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\textwidth]{network-diagram}
-    \caption{Networking diagram}
+    \caption{Diagram showing the client-broker MQTT interface for relaying data captured by remote BCI devices to an AWS cloud service and thereafter, to a web application for visualisation. }
     \label{fig:networking-diagram-c5}
 \end{figure}
+
+As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a message broker (server) and several clients. In this case, the AWS IoT service acts as an MQTT broker that receives messages published by remote ESP32 BCI clients. Each of the clients have a unique client ID but subscribe to a common topic that the AWS service expects. Although the design of subsequent elements in the AWS cloud pipeline was not included in this project, a schematic representation is presented in Figure \ref{fig:networking-diagram-c5}: data received from BCI clients over MQTT is streamed to a web application that can be view in real time.
 
 
 \section{Algorithm Implementation}
