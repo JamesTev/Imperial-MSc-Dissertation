@@ -131,6 +131,7 @@ Mention typical filtering choices - e.g. bandpass + 50Hz notch
 \subsection{Statistical}
 
 \subsubsection{Canonical correlation analysis (CCA)}
+\label{subsection:CCA-c2}
 CCA is a standard multivariate statistical technique for analysing multiple variables measured on a set of observations. In particular, variables are partitioned into two sets or \textit{views} of the data \cite{cca-tutorial}. Effectively, CCA is a multivariate extension of ordinary correlation. Given variable partitions $\mX \in \R^{m\times p}$, $\mY \in \R^{m\times q}$ each with $m$ observations, CCA seeks to find a linear combination of $\mX$, $\mY$ that maximises the correlation between their images $\vz_X = \mX\vw_X$ and $\vz_Y = \mY\vw_Y$. These images are known as the \textit{canonical variables} and $\vw_X$ and $\vw_Y$ are the \textit{canonical weight vectors} that effectively act as spatial filters across signal channels.
 
 With CCA for SSVEP frequency recognition tasks, $\mX \in \R^{N_s\times N_c}$ is the set of \textit{measured} EEG signals from $N_c$ channels over $N_s$ observations. The measured signals in $\mX$ must be compared with each frequency $f_k \in \mathcal{F}$, a finite set of candidate stimulus frequencies. CCA can be used to compute weighted correlations between the measured signals and each candidate frequency $f_k$ by constructing a sinusoidal reference signal set $\mY_k \in \R^{N_s \times 2N_h}$ as follows: 

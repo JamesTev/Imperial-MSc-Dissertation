@@ -5,58 +5,81 @@
 \graphicspath{ {report/C5 System Design/assets/} } 
 
 \section{Design of the SSVEP Stimuli}
+\label{subsection:ssvep-stimuli}
+A key consideration in the design of the SSVEP stimuli is the stimulus frequencies $f_1, \dots, f_n$ to use. As mentioned in Section \ref{subsection:time-frequency-considerations-c2}, similar studies typically use stimulus frequencies between 7Hz and 12Hz for this task. Furthermore, as detailed in Section \ref{subsection:CCA-c2}, CCA and CCA-based decoding algorithms involve a harmonic reference signal set. An important consideration is the \textit{number of harmonics} to include in these reference sets. In order to allow for a fundamental stimulus frequency range of 7Hz to 12Hz, it is only feasible to include one harmonic ($N_h=1$) in the reference set since the second harmonic of a 12Hz stimulus signal would occur at 36Hz which would likely be attenuated somewhat by the analogue low-pass filter (corner frequency of 37.4Hz) and low-pass filter dynamics of the adjustable output amplifier (corner frequency of 36.35Hz) shown in Figure \ref{fig:analogue-system-c4}. Furthermore, including the second harmonic for each stimulus frequency would have significant memory and computation implications. It is for these reasons that only a single harmonic was used in this system (where applicable).
 
-Naturally, an important part of the SSVEP-based BCI system is the SSVEP stimuli which will be presented to individuals participating in the exhibition (or in general, anyone interacting with the system thereafter). Taking into account design parameters such as stimulus colour, position and contrast mentioned in the literature cited in Section \ref{subsection:evoking-measuring-ssveps}, a basic user interface (UI) was designed with a series of flashing squares as depicted in Figure \ref{fig:ssvep-squares-c5}. This UI was implemented as a lightweight HTML page with basic CSS styling and Javascript to handle animation (flickering of the squares). This decision was made to allow for the simplest and most convenient deployment across any device capable of displaying a web page (mobile or otherwise). The number of blocks being displayed and their labels are subject to adjustment in accordance with other elements of the demonstration beyond the scope of this project.
+\subsection{SSVEP stimulus interface}
 
-\begin{figure}][!htb]
+Naturally, an important part of the SSVEP-based BCI system is the SSVEP stimuli which are to be presented to individuals participating in the exhibition (or in general, anyone interacting with the system thereafter). Taking into account design parameters such as stimulus colour, position and contrast mentioned in the literature cited in Section \ref{subsection:evoking-measuring-ssveps}, a basic user interface (UI) was designed with a series of flashing squares as depicted in Figure \ref{fig:ssvep-squares-c5}. This UI was implemented\footnote{code implementation available \href{https://github.com/JamesTev/EEG-decoding/blob/master/ui/ssvep_squares.html}{here}.} as a lightweight HTML page with basic CSS styling and Javascript to handle animation (flickering of the squares). This decision was made to allow for the simplest and most convenient deployment across any device capable of displaying a web page (mobile or otherwise). The number of blocks being displayed and their labels are subject to adjustment in accordance with other elements of the demonstration beyond the scope of this project.
+
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.8\textwidth]{ssvep-squares}
+    \includegraphics[width=0.7\textwidth]{ssvep-squares}
     \caption{Screen capture of the user interface for displaying SSVEP stimuli. The blocks can be independently set to any flicker frequency of interest.}
     \label{fig:ssvep-squares-c5}
 \end{figure}
 
-A key consideration in the design of the SSVEP stimuli is the stimulus frequencies $f_1, \dots, f_n$ to use. As mentioned in Section \ref{subsection:time-frequency-considerations-c2}, similar studies typically use stimulus frequencies between 6Hz and 15Hz for this task. Based on frequencies most commonly selected, the set of stimulus frequencies $\mathcal{F}$ selected for this project were: $\mathcal{F} = \{f_1, \dots, f_n\} = \{7, 8, 10, 12\}$ (all in Hz). Note that, external factors related to this project may only require some subset of $\mathcal{F}$: for example, the stimulus square corresponding to `down' may be omitted if only the other three actions are required in the game or simulation. 
+Note that, external factors related to this project may only require some subset of the stimuli shown in Figure \ref{fig:ssvep-squares-c5}; for example, the square corresponding to `down' may be omitted if only the other three actions are required in the game/simulation. 
 
-\section{Digital Signal Processing System}
+\section{Design of the Digital System}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{digital-system-overview}
+    \caption{Overview diagram of the core components that comprise the digital system designed in this project.}
+    \label{fig:digital-system-overview-c5}
+\end{figure}
+
+
+\subsection{Digital signal processing system}
 
 A crucial part in the design of the BCI system is the digital signal processing (DSP) system. The key functions of this system are to digitise, filter and resample the analogue output of the analogue signal processing system presented in Figure \ref{fig:analogue-system-c4}. An overview of the DSP system is shown in Figure \ref{fig:digital-system-c5}.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=\textwidth]{digital-system}
-    \caption{Digital signal processing system}
+    \includegraphics[width=0.9\textwidth]{digital-system}
+    \caption[Digital signal processing system]{Overview diagram of the core components of the digital signal processing system.}
     \label{fig:digital-system-c5}
 \end{figure}
 
-Details of the components shown in Figure \ref{fig:digital-system-c5} are provided below. 
+\subsubsection{Sampling and decimation}
+The analogue signal $x(t)$ is digitised to $x_1[n]$ using the 12-bit SAR ADC on-board the ESP32. A sampling frequency of $f_s=256$Hz was selected based for several reasons. First, this is a typical value mentioned in the literature as noted in Section \ref{subsection:time-frequency-considerations-c2}. Second, and more importantly, considering the SSVEP stimulus frequency band of 6 - 12Hz as mentioned in Section \ref{subsection:ssvep-stimuli}, and allowing for one reference signal harmonic in CCA-based decoding algorithms, the maximum theoretical frequency required is $f_{\textrm{max}}=24$Hz. In order to satisfy the Nyquist sampling criterion, sampling at $f_s > 2f_{\textrm{max}} = 48$Hz is required. 64Hz was identified as an appropriate fit as it provides some frequency margin for filter roll-off and it is a factor of 256Hz which facilitates decimation by an integer factor.
 
-\subsubsection{Sampling}
-The analogue signal $x(t)$ digitised to $x_1[n]$ using the 12-bit SAR ADC on-board the ESP32. A sampling frequency of $f_s=256$Hz was selected based for several reasons. First, this is a typical value mentioned in the literature as noted in Section \ref{subsection:time-frequency-considerations-c2}. Second, and more importantly, considering the SSVEP target frequency band 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\textwidth]{ssvep-bands}
+    \caption[Diagram showing SSVEP stimulus frequency bands and other important frequencies]{Diagram showing SSVEP stimulus frequency bands and other important frequencies. Band (a) represents the fundamental stimulus frequency range and (b) represents the range of first harmonics thereof. The dotted red line is an indicative (idealised) low-pass filter response with corner frequency at $f_c=26$Hz. Including a small safety margin to allow for filter roll-off, $f_n$ represents the Nyquist frequency for this configuration.}
+    \label{fig:ssvep-bands}
+\end{figure}
 
-\subsubsection{Digital low-pass filtering}
+Figure \ref{fig:ssvep-bands} shows a high-level view of the sampling and filtering requirements of the system taking into account EEG and SSVEP dynamics, as well as restrictions specific to this project such as memory constraints. 
 
-\subsubsection{Downsampling}
+\subsubsection{Digital filtering}
+As indicated in Figure \ref{fig:ssvep-bands}, an ideal low-pass filter for this system would achieve zero pass-band distortion (ripple) between 7 and $24$Hz and steep roll-off after $f_c=26$Hz to achieve complete signal attenuation before the Nyquist frequency $f_n=32$Hz. Obviously, this is not physically realisable and so a trade-off between maximising filter roll-off and minimising pass-band ripple must be sought.  
 
-
-\begin{enumerate}[label=(\alph*)] % (a), (b), (c), ...
-\item sampling
+Infinite impulse response (IIR) filters are typically more suitable for small, resource-constrained DSP systems. Compared to finite impulse response (FIR) filters, they generally offer:
 \begin{itemize}
-   
+    \item the ability to be implemented recursively
+    \item greater computational efficiency
+    \item lower memory requirements
+    \item improved resolution at lower frequencies
 \end{itemize}
-\item low-pass filter
+Although FIR filters typically offer greater stability and controllability owing to only having zeros in their transfer functions, the aforementioned benefits of IIR filters were deemed to be more important for this application. 
+
+Figure \ref{fig:digital-filt-resp} shows the frequency response of three different commonly used IIR digital filters: type I and II Chebyshev filters, as well an elliptical filter. Each of these filters were designed to meet the following requirements:
 \begin{itemize}
-    \item low-pass filter to isolate the frequency band of interest from DC to $28$Hz. Used to provide greater 50Hz noise rejection to allow for downsampling. 
-    \item corner frequency $f_c=32$Hz
-    \item $10^{\textrm{th}}$ order elliptical filter
-    \item 50Hz rejection characteristics: minimum 17dB, nominal 35dB and maximum 55dB.
+\label{list:filter-design-reqs}
+    \item maximum filter order of $n=10$
+    \item maximum pass-band ripple (below unity gain) of $r_p=0.2$dB 
+    \item minimum stop-band attenuation of $r_s=80$dB
 \end{itemize}
 
-\item adjustable-gain output amplifier
-\begin{itemize}
-    \item adjustable gain between 1.745 and 19.2
-    \item input low-pass filter dynamics: corner frequency of $f_c=36.35$Hz 
-\end{itemize}
-\end{enumerate}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{digital-filt-resp}
+    \caption[Frequency response of the digital low-pass filter implemented in firmware on the ESP32]{Frequency response of the digital low-pass filter implemented in firmware on the ESP32. The pre-filtered Nyquist frequency in this implementation is 128Hz: half the 256Hz sampling frequency.}
+    \label{fig:digital-filt-resp}
+\end{figure}
+Observing the magnitude plot in the to half of Figure \ref{fig:digital-filt-rep}, it is evident that the response of the elliptic filter offers the optimal balance of steep roll-off between pass and stop bands and acceptable ripple in the stop and pass bands. This is intuitive: as $r_p$ approaches zero, the elliptical filter becomes a Chebyshev type II filter. As $r_s$ approaches zero, it becomes a Chebyshev type I filter. The phase response of the elliptical filter is also largely linear in the pass-band. For these reasons, a $10^{\textrm{th}}$ order elliptical low-pass filter satisfying the aforementioned design requirements was selected.
 
 \section{Firmware structure}
 Discuss Micropython and uLab here, including their features, benefits and potential drawbacks compared to more conventional C/C++.
@@ -65,6 +88,12 @@ Discuss module structure and give a diagram of how modules are arranged and what
 \subsection{Networking}
 Discuss AWS IoT interface and real-time streaming capabilities using MQTT
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{network-diagram}
+    \caption{Networking diagram}
+    \label{fig:networking-diagram-c5}
+\end{figure}
 
 
 \section{Algorithm Implementation}
