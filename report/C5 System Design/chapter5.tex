@@ -81,9 +81,31 @@ Figure \ref{fig:digital-filt-resp} shows the frequency response of three differe
 \end{figure}
 Observing the magnitude plot in the to half of Figure \ref{fig:digital-filt-rep}, it is evident that the response of the elliptic filter offers the optimal balance of steep roll-off between pass and stop bands and acceptable ripple in the stop and pass bands. This is intuitive: as $r_p$ approaches zero, the elliptical filter becomes a Chebyshev type II filter. As $r_s$ approaches zero, it becomes a Chebyshev type I filter. The phase response of the elliptical filter is also largely linear in the pass-band. For these reasons, a $10^{\textrm{th}}$ order elliptical low-pass filter satisfying the aforementioned design requirements was selected.
 
-\section{Firmware structure}
-Discuss Micropython and uLab here, including their features, benefits and potential drawbacks compared to more conventional C/C++.
-Discuss module structure and give a diagram of how modules are arranged and what functionality they provide
+\section{Embedded Firmware}
+As alluded to in Section \ref{subsection:electronic-hardware-proto}, all firmware for this system was to be developed for the ESP32 SoC developed by Espressif Systems. Espressif offers a comprehensive \href{https://github.com/espressif/esp-idf}{open source} framework called the Espressif IoT Development Framework (ESP-IDF) that can be used to develop ESP32-based applications on Windows, Linux and macOS using C and C++ programming languages. Furthermore, ESP-IDF tooling has been extended to be used with the popular open source platform Arduino. While the ESP-IDF has arguably become the de facto standard for developing complex embedded applications for the ESP32, a different approach was taken in this project for reasons explored below. 
+
+\subsection{MicroPython}
+MicroPython is a lean and highly efficient implementation of the Python 3 language that provides a carefully-selected subset of the Python standard library that is optimised for microcontrollers and other resource-constrained targets \cite{micropython}. In fact, MicroPython is a full Python compiler and runtime implemented in C (C99) that runs natively (on bare metal) on several architectures. It is an open source project started by Damien George in 2013 that has since gained great traction from the open source community with constant feature updates and fixes. Some of its notable features include \cite{micropython}: 
+\begin{enumerate}
+    \item compact enough to fit and run within 256k of ROM (code space) and 16k of RAM.
+    \item many different compile-time configuration options
+    \item support for many architectures (both for microcontrollers and fully-fledged microprocessors): x86, x86-64, ARM, ARM Thumb, Xtensa
+    \item inline assembler for Thumb and Xtensa instruction sets
+    \item a cross-compiler that allows ordinary Python scripts to be cross-compiled into bytecode that can be loaded from non-volatile flash instead of RAM.
+    \item explicit memory errors (\texttt{MemoryError}) for heap exhaustion
+    \item explicit run time errors (\texttt{RuntimeError}) when reaching the stack limit
+\end{enumerate}
+
+The technical features of MicroPython listed above have some very useful practical implications for application development on the ESP32 that are not available when developing using the ESP-IDF in C/C++. Practical advantages of MicroPython include:
+\begin{itemize}
+    \item The convenience of using the Python programming language which offers far more high-level functions and constructs over C or C++.
+    \item A real-time interactive Python prompt (REPL) that allows commands to be tested and executed immediately over a serial connection. For some MicroPython ports, including that of the ESP32, a WebREPL is also provided that allows for interactivity over a wireless network connection.
+    \item Support for both microcontroller and desktop architectures such as X86 allows MicroPython code to be tested with exact equivalence on a personal computer without having to interact with a microcontroller. This can be very useful for prototyping and algorithm development.
+    \item A very familiar and intuitive micro-directory and module structure that emulates regular Python modules (explored more below).
+    \item A community of open source developers that can very easily contribute new modules and peripheral functionality 
+\end{itemize}
+
+\subsection{Module structure}
 
 \subsection{Networking}
 Discuss AWS IoT interface and real-time streaming capabilities using MQTT
