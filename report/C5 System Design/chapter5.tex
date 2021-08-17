@@ -159,25 +159,33 @@ An additional important motivation for using MicroPython over the more tradition
     \item implementation of digital filters using second order sections (SOS)
     \item basic numerical approximation and function minimisation
 \end{enumerate}
-Being able to perform matrix and array operations, filtering and numerical approximation on a microcontroller in an elegant, Pythonic way is clearly an invaluable asset for this project. Indeed, for any project of this sort, it is somewhat amazing. Listing \ref{listing:ulab-intro} briefly demonstrates just how effortlessly t
+Being able to perform matrix and array operations, filtering and numerical approximation on a microcontroller in an elegant, Pythonic way is clearly an invaluable asset for this project. Indeed, for any project of this sort, it is somewhat amazing. Listing \ref{listing:ulab-intro} briefly demonstrates just how effortlessly complex numerical computations can be performed using \texttt{ulab}.
 
 \begin{listing}[h]
 \begin{minted}{python}
-# import user-specific functions from non-volatile memory
-from lib.decoding import cca
-from lib.computation import solve_gen_eig_prob as solve_eig
+# import ulab module
+from ulab import numpy as np
 
-# MicroPython emulation of the standard Python `os` module
-import os
+# create an arbitrary positive definite, symmetric 3x3 matrix
+# A can be sliced like A[i0:i1, j0:j1]
+A = np.array([[25, 15, -5], [15, 18,  0], [-5,  0, 11]])
 
-# list root directory
-print(os.listdir('/'))
+# compute lower triangular square root or A using Cholesky decomp
+A_sqrt = np.linalg.cholesky(A)
 
-# open and read a file from flash
-with open('/logs/log-10072021.txt') as f:
-    print(f.read())
+# compute determinant of A
+det_A = np.linalg.det(A)
+
+# compute inverse of A
+A_inv = np.linalg.inv(A)
+
+# compute Moore-Penrose pseudoinverse of A = (A^T.A)^-1.A^T
+A_pinv = np.dot(np.linalg.inv(np.dot(np.transpose(A), A)), np.transpose(A))
+
+# many other utility functions such as argmax(), argsort(), convolve()
+
 \end{minted}
-\caption[Basic MicroPython code to import user-specific modules and read from a text file in non-volatile storage.]{Basic MicroPython code to import user-specific modules and read from a text file in non-volatile storage. Note that the syntax is identical to ordinary Python.}
+\caption{Illustration of the convenience offered by the \texttt{ulab} module for linear algebra and general numerical computing}
 \label{listing:ulab-intro}
 \end{listing}
 
