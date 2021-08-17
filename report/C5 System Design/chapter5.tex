@@ -106,11 +106,85 @@ The technical features of MicroPython listed above have some very useful practic
 \end{itemize}
 
 \subsection{Module structure}
+As alluded to above, a very convenient feature of MicroPython is its intuitive module/file structure. It allows python modules in the form of \texttt{.py} files to be organised in folders that serve as packages as with regular Python. This file structure is stored directly in flash storage on the device and can be read or written to at any time during development. Consider the module structure of the MicroPython application developed in this project below:
+
+\dirtree{%
+.1 /.
+.2 boot.py.
+.2 main.py.
+.2 .env.
+.2 lib.
+.3 core.py.
+.3 decoding.py.
+.3 peripherals.py.
+.3 \dots.
+.2 certificates.
+.3 dab0ac2b5c-private.pem.key.
+.3 dab0ac2b5c-public.pem.key.
+.3 dab0ac2b5c-certificate.pem.crt.
+.2 logs.
+.3 log-17082021-1.json.
+.3 log-10072021.txt.
+}
+The root directory contains two important files - \texttt{boot.py} and \texttt{main.py} - that are run in sequence at boot time. The \texttt{boot.py} script is typically used for internal system processes and \texttt{main.py} is used for any user functionality that should automatically be run at boot. Also in the root directory is the \texttt{.env} file which can be used to store sensitive environment variables such as Wi-Fi passwords or API key strings. The \texttt{lib} directory (package) contains the modules that implement the actual functionality of the digital system, including peripheral management, decoding and computation and networking (note that not all modules are shown above). Amazon AWS key files and certificates for secure MQTT communication are stored in the \texttt{certificates} folder. Finally, a \texttt{logs} directory shows how log files can also be very conveniently stored in arbitrary formats such as \texttt{.json} or \texttt{.txt} in non-volatile flash memory. Listing \ref{listing:dir-structure} below demonstrates how user-specific modules and files can be imported and used within a new script once flashed to the microcontroller's non-volatile memory. 
+
+\begin{listing}[h]
+\begin{minted}{python}
+# import user-specific functions from non-volatile memory
+from lib.decoding import cca
+from lib.computation import solve_gen_eig_prob as solve_eig
+
+# MicroPython emulation of the standard Python `os` module
+import os
+
+# list root directory
+print(os.listdir('/'))
+
+# open and read a file from flash
+with open('/logs/log-10072021.txt') as f:
+    print(f.read())
+\end{minted}
+\caption[Basic MicroPython code to import user-specific modules and read from a text file in non-volatile storage.]{Basic MicroPython code to import user-specific modules and read from a text file in non-volatile storage. Note that the syntax is identical to ordinary Python.}
+\label{listing:dir-structure}
+\end{listing}
+
+\subsection{Numerical computation}
+An additional important motivation for using MicroPython over the more traditional C/C++ approach is the ability to use an extremely convenient open source MicroPython module called \texttt{ulab}\footnote{Source code and documentation available \href{https://github.com/v923z/micropython-ulab}{here}.} The \texttt{ulab} project was created to offer a subset of the very popular \texttt{numpy} numerical computing library for Python which offers highly performant array computing and linear algebra functionality. It also implements a small subset of functionality offered by \textt{scipy}; the equally popular scientific computing library for Python. Some of the most notable features offered by this module include \cite{ulab}:
+\begin{enumerate}
+    \item compact, iterable and sliceable arrays structures for numerical data up to 4 dimensions
+    \item extremely frugal with RAM usage
+    \item efficient, vectorised computations on multi-dimensional arrays
+    \item basic linear algebra functionality such as matrix inversion, multiplication, determinants, Cholesky and QR decomposition
+    \item fast Fourier transforms (FFTs)
+    \item implementation of digital filters using second order sections (SOS)
+    \item basic numerical approximation and function minimisation
+\end{enumerate}
+Being able to perform matrix and array operations, filtering and numerical approximation on a microcontroller in an elegant, Pythonic way is clearly an invaluable asset for this project. Indeed, for any project of this sort, it is somewhat amazing. Listing \ref{listing:ulab-intro} briefly demonstrates just how effortlessly t
+
+\begin{listing}[h]
+\begin{minted}{python}
+# import user-specific functions from non-volatile memory
+from lib.decoding import cca
+from lib.computation import solve_gen_eig_prob as solve_eig
+
+# MicroPython emulation of the standard Python `os` module
+import os
+
+# list root directory
+print(os.listdir('/'))
+
+# open and read a file from flash
+with open('/logs/log-10072021.txt') as f:
+    print(f.read())
+\end{minted}
+\caption[Basic MicroPython code to import user-specific modules and read from a text file in non-volatile storage.]{Basic MicroPython code to import user-specific modules and read from a text file in non-volatile storage. Note that the syntax is identical to ordinary Python.}
+\label{listing:ulab-intro}
+\end{listing}
 
 \subsection{Networking}
 Discuss AWS IoT interface and real-time streaming capabilities using MQTT
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=\textwidth]{network-diagram}
     \caption{Networking diagram}
@@ -120,6 +194,42 @@ Discuss AWS IoT interface and real-time streaming capabilities using MQTT
 
 \section{Algorithm Implementation}
 
+\begin{algorithm}[H]
+\DontPrintSemicolon
+  
+  \KwInput{Your Input}
+  \KwOutput{Your output}
+  \KwData{Testing set $x$}
+  $\sum_{i=1}^{\infty} := 0$ \tcp*{this is a comment}
+  \tcc{Now this is an if...else conditional loop}
+  \If{Condition 1}
+    {
+        Do something    \tcp*{this is another comment}
+        \If{sub-Condition}
+        {Do a lot}
+    }
+    \ElseIf{Condition 2}
+    {
+    	Do Otherwise \;
+        \tcc{Now this is a for loop}
+        \For{sequence}    
+        { 
+        	loop instructions
+        }
+    }
+    \Else
+    {
+    	Do the rest
+    }
+    
+    \tcc{Now this is a While loop}
+   \While{Condition}
+   {
+   		Do something\;
+   }
+
+\caption{Example code}
+\end{algorithm}
 
 
 Discuss numerical challenges, precision issues, memory constraints
