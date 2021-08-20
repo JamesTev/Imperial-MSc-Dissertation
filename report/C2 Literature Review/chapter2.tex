@@ -138,6 +138,24 @@ The authors in \cite{zhao-stimulus-layout-effect} studied the effects of the arr
 % Decoding algos section
 \section{Computational Approaches for SSVEP Decoding}
 \subsection{Power spectral density and frequency domain}
+Arguably the most obvious approach to analysing periodic signals in order to distinguish frequency content is through the use of Fourier analysis. Power spectral density analysis (PSDA) is typically used to analyse the power of a signal over a continuous frequency range. For a discrete time deterministic signal ${x[n]}$ with finite energy $\sum_{n=-\infty}^\infty |x[n]|^2 < \infty$, the discrete time Fourier transform (DTFT) is defined as 
+\begin{equation}
+    X(\omega)=\sum_{n=-\infty}^{\infty} x[n] e^{-j \omega n}
+\end{equation}
+The energy spectral density $S_x(\omega)$ of $x[n]$ is defined as $S_x(\omega) = |X(\omega)^2|$. The power spectral density (PSD) $P_x(\omega)$ of $x[n]$ of finite length $N$ is defined as 
+\begin{equation}
+P_x(\omega)=\lim _{N \rightarrow \infty} E\left\{\frac{1}{N}\left|\sum_{n=0}^{N-1} x[n] e^{-jn \omega}\right|^{2}\right\}
+\end{equation}
+The PSD represents the distribution of signal power over a frequency range of interest. In practice, one can only consider finite length signals with $N < \infty$ and so, $P_x(\omega)$ must be estimated (albeit arbitrarily closely). Such an estimate of power spectral density is called a \textbf{periodogram}.
+
+In the context of SSVEP decoding, it is clear how PSDA could be useful. Simply by computing the periodogram (estimated PSD) of a measured EEG signal $x[n]$, the target SSVEP stimulus frequency $f^* \in \mathcal{F}$ could be inferred from the set of candidate stimulus frequencies $\mathcal{F}$ by choosing $f^* = \argmax_{f \in \mathcal{F}} P_x(\omega)$ where $\omega=2\pi f$. 
+
+\subsubsection{Welch's method for PSD estimation}
+Welch's method is commonly used to reduce noise in PSD analysis. This approach involves dividing the original signal into short overlapping windows of length $N^* \leq N$ which are then windowed (in the time domain). The periodograms of these windows are computed independently and then averaged. While this approach reduces variance in the final periodogram, it comes at the cost of decreased frequency resolution. Furthermore, the type of window used should be chosen carefully as this will further impact the resolution-variance trade off. Hamming, Blackman and Bartlett windows are popular choices.
+
+\subsubsection{Efficacy of PSDA for SSVEP decoding}
+Many studies have demonstrated that PSDA can be used for SSVEP decoding/classification \cite{zhao-stimulus-layout-effect}, \cite{bci-survey-nicolas-alonso}, \cite{acampora-dataset}. However, it is widely documented that PSDA is inferior to more specialised statistical techniques that have been developed for this task: both in terms of signal classification accuracy and information transfer rate (ITR) \cite{autthasan-single-chan-ssvep}, \cite{lin-cca-2006}, \cite{sun-gcca}, \cite{zhang-mset-cca}, \cite{hakvoort-cca-psda-comparison}. The authors in \cite{hakvoort-cca-psda-comparison} performed a study specifically to compare the efficacy of PSDA vs statistical algorithms such as CCA (explored below) in EEG signal decoding. Their findings reinforce those of their colleagues in that CCA and its derivatives produce better decoding performance than PSDA.
+
 \subsection{Statistical}
 
 \subsubsection{Canonical correlation analysis (CCA)}

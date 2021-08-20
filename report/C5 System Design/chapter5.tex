@@ -205,6 +205,13 @@ As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a m
 
 \section{Algorithm Implementation}
 
+\subsection{Eigenvalue algorithms}
+
+
+\subsubsection{Generalised eigenvalue algorithms}
+
+The MicroPython implementation of the generalised eigenvalue in Algorithm \ref{algo:gen-eig-algo} can be found in Listing \ref{app-listing:gen-eig-prob-mpy} in Appendix \ref{app-listing:gen-eig-prob-mpy}.
+
 \begin{algorithm}
 \begin{algorithmic}
 \State $\Phi_{\mB}, \Lambda_{\mB} \gets \mB \Phi_{\mB}=\Phi_{\mB} \Lambda_{\mB}$ \Comment{compute eigenvectors $\Phi_{\mB}$ and eigenvalues $\Lambda_{\mB}$ of $\mB$}
@@ -215,6 +222,7 @@ As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a m
 \State $\Phi \gets \Phi=\widetilde{\Phi}_{\mB} \Phi_{\mA}$ \Comment{compute generalised eigenvectors}
 \State return $\Phi$, $\Lambda$ \Comment{return the generalised eigenvector and eigenvalue matrices}
 \end{algorithmic}
+\label{algo:gen-eig-algo}
 \caption{Generalised eigenvalue algorithm}
 \end{algorithm}
 
