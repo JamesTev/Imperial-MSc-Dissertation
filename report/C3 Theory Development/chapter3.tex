@@ -4,7 +4,57 @@
 
 \graphicspath{ {report/C3 Theory Development/assets/} } 
 
+\section{Eigenvalue Optimisation}
+Many, if not all, of the statistical decoding algorithms mentioned so far require a form of eigenvalue optimisation to find a solution. Worded differently, these are optimisation problems that can be conveniently reformulated as eigenvalue problems. 
+
+\subsection{Optimisation form I}
+\label{subsection:eig-opt-form-1}
+This form addresses constrained optimisation problems of the form
+
+\begin{equation}
+\begin{array}{ll}
+\underset{\vw}{\operatorname{maximize}} & \vw^{\top} \mA \vw \\
+\text { subject to } & \vw^{\top} \vw=1,
+\end{array}
+\label{eq:eig-opt-1}
+\end{equation}
+with variable $\vw \in \R^{d}$ and $\mA \in \R^{d\times d}$. Employing Lagrange dual theory, the Lagrangian for (\ref{eq:eig-opt-1}) is 
+\begin{equation}
+\mathcal{L}=\vw^{\top} \boldsymbol{A} \vw-\lambda\left(\vw^{\top} \vw-1\right),
+\end{equation}
+with Lagrange multiplier $\lambda \in \R$ \cite{eig-tutorial}. Referencing the KKT conditions, \textit{stationary} requires $\frac{\partial \mathcal{L}}{\partial \vw} = 0$:
+\begin{equation}
+\mathbb{R}^{d} \ni \frac{\partial \mathcal{L}}{\partial \vw}=2 A \vw-2 \lambda \vw \stackrel{\text { set }}{=} 0 \Longrightarrow A \vw=\lambda \vw,
+\end{equation}
+yielding the standard eigenvalue problem in $\mA$. Since (\ref{eq:eig-opt-1}) was posed as a maximisation problem, the optimal $\vw$ corresponds to the largest eigenvalue in $\mA$. For a minimisation problem, it would correspond to the smallest eigenvalue.
+
+\subsection{Optimisation form II}
+\label{subsection:eig-opt-form-2}
+The second form is an extension of the prior univariate case to a multivariable system $\mW \in \R^{d\times d}$. Consider the following constrained optimisation problem:
+
+\begin{equation}
+\begin{array}{ll}
+\underset{\boldsymbol{\mW}}{\operatorname{maximize}} & \operatorname{tr}\left(\mW^{\top} \mA \boldsymbol{\mW}\right) \\
+\text { subject to } & \boldsymbol{\mW}^{\top} \boldsymbol{\mW}=\boldsymbol{\mI}\, ,
+\end{array}
+\label{eq:eig-opt-2}
+\end{equation}
+
+where tr(.) represents the matrix trace and $\mA \in \R^{d\times d}$. The Lagrangian for this problem, taken from
+\cite{eig-tutorial}, is the following:
+
+\begin{equation}
+    \mathcal{L} = \text{tr}(\mW^\top \mA \mW) - \text{tr}(\Lambda^\top(\mW^\top\mW - \mI)),
+\end{equation}
+where $\Lambda \in \R^{d\times d}$ is a diagonal matrix whose diagonal entries are the Lagrangian multipliers. Once again, applying the \textit{stationarity} condition, (\ref{eq:eig-opt-2}) can be reformulated to the following eigenvalue problem \cite{eig-tutorial}:
+\begin{align}
+\mathbb{R}^{d \times d} \ni \frac{\partial \mathcal{L}}{\partial \mW}&=2 A \mW -2 \mW \Lambda \stackrel{\text { set }}{=} 0 \\
+\Longrightarrow A \mW &=\mW \Lambda
+\end{align}
+The diagonal elements of $\Lambda$ are the eigenvalues of $\mA$ and are arranged in descending order for the maximisation problem and ascending order for the minimisation problem. The columns of $\mW$ are the corresponding eigenvectors.
+
 \section{Theoretical Development of SSVEP Decoding Algorithms}
+As mentioned in Section \ref{subsection:psda-vs-cca}, statistical algorithms selected or designed for SSVEP decoding have proven to be significantly more successful than PSDA approaches. Therefore, only the former will be explored in this section.
 
 \subsection{Canonical correlation analysis (CCA)}
 \label{section:cca-c3}

@@ -154,6 +154,7 @@ In the context of SSVEP decoding, it is clear how PSDA could be useful. Simply b
 Welch's method is commonly used to reduce noise in PSD analysis. This approach involves dividing the original signal into short overlapping windows of length $N^* \leq N$ which are then windowed (in the time domain). The periodograms of these windows are computed independently and then averaged. While this approach reduces variance in the final periodogram, it comes at the cost of decreased frequency resolution. Furthermore, the type of window used should be chosen carefully as this will further impact the resolution-variance trade off. Hamming, Blackman and Bartlett windows are popular choices.
 
 \subsubsection{Efficacy of PSDA for SSVEP decoding}
+\label{subsection:psda-vs-cca}
 Many studies have demonstrated that PSDA can be used for SSVEP decoding/classification \cite{zhao-stimulus-layout-effect}, \cite{bci-survey-nicolas-alonso}, \cite{acampora-dataset}. However, it is widely documented that PSDA is inferior to more specialised statistical techniques that have been developed for this task: both in terms of signal classification accuracy and information transfer rate (ITR) \cite{autthasan-single-chan-ssvep}, \cite{lin-cca-2006}, \cite{sun-gcca}, \cite{zhang-mset-cca}, \cite{hakvoort-cca-psda-comparison}. The authors in \cite{hakvoort-cca-psda-comparison} performed a study specifically to compare the efficacy of PSDA vs statistical algorithms such as CCA (explored below) in EEG signal decoding. Their findings reinforce those of their colleagues in that CCA and its derivatives produce better decoding performance than PSDA.
 
 \subsection{Statistical}
@@ -163,6 +164,7 @@ Many studies have demonstrated that PSDA can be used for SSVEP decoding/classifi
 CCA is a standard multivariate statistical technique for analysing multiple variables measured on a set of observations. In particular, variables are partitioned into two sets or \textit{views} of the data \cite{cca-tutorial}. Effectively, CCA is a multivariate extension of ordinary correlation. Given variable partitions $\mX \in \R^{m\times p}$, $\mY \in \R^{m\times q}$ each with $m$ observations, CCA seeks to find a linear combination of $\mX$, $\mY$ that maximises the correlation between their images $\vz_X = \mX\vw_X$ and $\vz_Y = \mY\vw_Y$. These images are known as the \textit{canonical variables} and $\vw_X$ and $\vw_Y$ are the \textit{canonical weight vectors} that effectively act as spatial filters across signal channels.
 
 With CCA for SSVEP frequency recognition tasks, $\mX \in \R^{N_s\times N_c}$ is the set of \textit{measured} EEG signals from $N_c$ channels over $N_s$ observations. The measured signals in $\mX$ must be compared with each frequency $f_k \in \mathcal{F}$, a finite set of candidate stimulus frequencies. CCA can be used to compute weighted correlations between the measured signals and each candidate frequency $f_k$ by constructing a sinusoidal reference signal set $\mY_k \in \R^{N_s \times 2N_h}$ as follows: 
+
 \begin{equation}
 \mY_{k}=\left(\begin{array}{c}
 \sin \left(2 \pi f_{k} t\right) \\
@@ -175,11 +177,13 @@ With CCA for SSVEP frequency recognition tasks, $\mX \in \R^{N_s\times N_c}$ is 
 \end{array}\right), \quad t=\frac{1}{f_s}, \frac{2}{f_s}, \ldots, \frac{N_s}{f_s}
 \label{eq:sinusoidal-ref}
 \end{equation}
+
 where $f_s$ is the sampling frequency and $N_h$ is the number of harmonics in the reference set, a parameter to be chosen. The scalp and other interacting layers between the brain and surface electrodes are both resistive and capacitive, producing low-pass filter dynamics \cite{baillet-em-brain-mapping}, \cite{lin-cca-2006}. Therefore, it is rare that more than $N_h=5$ harmonics are selected in the reference signal set \cite{lin-cca-2006}. The final task of frequency recognition is performed by selecting the frequency $f^*$
 \begin{equation}
     f^* = \argmax_{f_k} \; \rho_k, \quad \forall \, f_k \in \mathcal{F}
     \label{eq:cca-freq-discrimination}
 \end{equation}
+
 corresponding to the candidate frequency $f_k$ which maximises the canonical correlation $\rho_k$ between $\mX$ and the the reference set $\mY_k$. While standard CCA is a good starting point for statistical SSVEP decoding as it forms the basis of many similar algorithms, there are several extensions which have been shown to improve signal recognition performance \cite{zhang-mset-cca}, \cite{sun-gcca}, \cite{miao-hybrid-cca}. The most promising of these are explored below.
 
 \subsubsection{Task-related component analysis (TRCA)}
@@ -189,7 +193,7 @@ Task-related component analysis (TRCA) as a decoding technique in biophysical sy
 To illustrate the basic idea of this algorithm, \cite{tanaka-trca} presents a useful toy example. Consider a task-related signal $s(t)$ standardised to have zero mean and unit variance embedded in additive white (uncorrelated) noise $n(t)$: $x(t) = a_1s(t) + a_2n(t)$ with some mixing scalars $a_i \in \R$. Then, assume the observable signal $x(t)$ is measured over two distinct blocks or trials to yield $x_1(t)$ and $x_2(t)$. A linear model of the two observed blocks could be defined as follows:
 \begin{align}
     x_1(t) = a_{11}s(t) + a_{12}n(t) \\
-    x_2(t) = a_{21}s(t) + a_{22}n(t) \\
+    x_2(t) = a_{21}s(t) + a_{22}n(t)
 \end{align}
 As mentioned above, TRCA attempts to recover task related components (only $s(t)$ in this case) from a linear combination of observations across trials. Defining this weighted sum as $y(t)$ with 
 \begin{equation}
