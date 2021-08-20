@@ -206,48 +206,36 @@ As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a m
 \section{Algorithm Implementation}
 
 \begin{algorithm}
-$\Phi_{B}, \Lambda_{B} \leftarrow B \Phi_{B}=\Phi_{B} \Lambda_{B}$\\
-$\Phi_{B} \leftarrow \breve{\Phi}_{B}=\Phi_{B} \Lambda_{B}^{-1 / 2} \approx \Phi_{B}\left(\Lambda_{B}^{1 / 2}+\varepsilon I\right)^{-1}$\\
-$\breve{A} \leftarrow \breve{A}=\breve{\Phi}_{B}^{\top} A \breve{\Phi}_{B}$\\
-$\Phi_{A}, \Lambda_{A} \leftarrow \breve{A} \Phi_{A}=\Phi_{A} \Lambda_{A}$\\
-$\Lambda \leftarrow \Lambda=\Lambda_{A}$\\
-$\Phi \leftarrow \Phi=\breve{\Phi}_{B} \Phi_{A}$\\
-$\text { return } \Phi, \, \Lambda$
+\begin{algorithmic}
+\State $\Phi_{\mB}, \Lambda_{\mB} \gets \mB \Phi_{\mB}=\Phi_{\mB} \Lambda_{\mB}$ \Comment{compute eigenvectors $\Phi_{\mB}$ and eigenvalues $\Lambda_{\mB}$ of $\mB$}
+\State $\widetilde{\Phi}_{\mB} \gets \widetilde{\Phi}_{\mB}=\Phi_{\mB} \Lambda_{\mB}^{-1 / 2} \approx \Phi_{\mB}\left(\Lambda_{\mB}^{1 / 2}+\varepsilon I\right)^{-1}$ \Comment{multiply above by $\Lambda_{\mB}^{-1 / 2}$, define intermediate $\widetilde{\Phi}_{\mB}$}
+\State $\widetilde{\mA} \gets \widetilde{\mA}=\widetilde{\Phi}_{\mB}^{\top} \mA \widetilde{\Phi}_{\mB}$ \Comment{define intermediate $\widetilde{\mA}$}
+\State $\Phi_{\mA}, \Lambda_{\mA} \gets \widetilde{\mA} \Phi_{\mA}=\Phi_{\mA} \Lambda_{\mA}$ \Comment{compute eigenvectors $\Phi_{\mA}$ and eigenvalues $\Lambda_{\mA}$  of $\widetilde{\mA}$}
+\State $\Lambda \gets \Lambda=\Lambda_{\mA}$ \Comment{notice that eigenvalues of $\widetilde{\mA}$ are the generalised eigenvalues }
+\State $\Phi \gets \Phi=\widetilde{\Phi}_{\mB} \Phi_{\mA}$ \Comment{compute generalised eigenvectors}
+\State return $\Phi$, $\Lambda$ \Comment{return the generalised eigenvector and eigenvalue matrices}
+\end{algorithmic}
 \caption{Generalised eigenvalue algorithm}
 \end{algorithm}
 
-\begin{algorithm}[H]
-\DontPrintSemicolon
-  eg
-  $\sum_{i=1}^{\infty} := 0$ \tcp*{this is a comment}
-  \tcc{Now this is an if...else conditional loop}
-  \If{Condition 1}
-    {
-        Do something    \tcp*{this is another comment}
-        \If{sub-Condition}
-        {Do a lot}
-    }
-    \ElseIf{Condition 2}
-    {
-    	Do Otherwise \;
-        \tcc{Now this is a for loop}
-        \For{sequence}    
-        { 
-        	loop instructions
-        }
-    }
-    \Else
-    {
-    	Do the rest
-    }
-    
-    \tcc{Now this is a While loop}
-   \While{Condition}
-   {
-   		Do something\;
-   }
-
-\caption{Example code}
+\begin{algorithm}
+\caption{An algorithm with caption}\label{alg:cap}
+\begin{algorithmic}
+\Require $n \geq 0$
+\Ensure $y = x^n$
+\State $y \gets 1$
+\State $X \gets x$
+\State $N \gets n$
+\While{$N \neq 0$}
+\If{$N$ is even}
+    \State $X \gets X \times X$
+    \State $N \gets \frac{N}{2}$  \Comment{This is a comment}
+\ElsIf{$N$ is odd}
+    \State $y \gets y \times X$
+    \State $N \gets N - 1$
+\EndIf
+\EndWhile
+\end{algorithmic}
 \end{algorithm}
 
 
