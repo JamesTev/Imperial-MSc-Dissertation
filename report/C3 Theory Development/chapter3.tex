@@ -99,6 +99,11 @@ If we let
 \end{equation}
 the standard power iteration is effectively applied to all the vectors $\vv_1^{(0)}, \dots, \vv_d^{(0)}$ at once \cite{panju-iterative-eig}. However, in order to actually extract different eigenvectors from the set of distinct initial vectors (columns of $\mV$), we must orthonormalise the columns of $\mV^{(k)}$ at each iteration. This was done in the univariate version of the power iteration algorithm; the multivariate analogue is to ensure the set of eigenvector estimates (columns of $\mV^{(k)}$ are orthonormal in each iteration \cite{panju-iterative-eig}. This is achieved by using the QR decomposition of $\mV^{(k)}$ which decomposes a matrix into the product of an orthonormal matrix $\mQ$ and an upper triangular matrix $\mR$. In each iteration, a new matrix $\mW$ is obtained by multiplying $\mA$ by the latest eigenvector approximation matrix $\mV^{(k-1)}$. $\mW$ is updated to the orthonormal columns of $\mQ^{(k)}$ from the QR decomposition of $\mW^{(k-1)}$.
 
+\subsection{QR iteration algorithm}
+While the simultaneous iteration is effective under some conditions, it is not commonly used in practice \cite{panju-iterative-eig}. The QR algorithm is a subtle yet elegant adjustment: in each iteration, $\mA$ is modified directly. Specifically, factor matrices $\mQ$ and $\mR$ from the QR decomposition of $\mA^{(k-1)}$ are simply multiplied in reverse order to obtain $\mA^{(k)} = \mR^{(k)}\mQ^{(k)}$. The motivation behind this is not immediately obvious or intuitive but can be explained through a restructuring of the simultaneous iteration algorithm as detailed at length in \cite{panju-iterative-eig}. 
+
+It should be noted that both the simultaneous iteration and QR iteration algorithms may fail if the eigenvalues of $\mA$ are not real or if the eigenvectors thereof do not form a basis for $\R^d$. 
+
 \section{SSVEP Decoding Algorithms}
 As mentioned in Section \ref{subsection:psda-vs-cca}, statistical algorithms selected or designed for SSVEP decoding have proven to be significantly more successful than PSDA approaches. Therefore, only the former will be explored in this section.
 
@@ -323,7 +328,7 @@ where Pearson's correlation is denoted by \textit{corr}. Finally, the output cor
 \end{equation}
 
 
-\subsection{Related theory}
-\subsubsection{Significance testing}
-\subsubsection{Quantifying signal quality}
-\subsubsection{Mechanics of sampling}
+% \subsection{Related theory}
+% \subsubsection{Significance testing}
+% \subsubsection{Quantifying signal quality}
+% \subsubsection{Mechanics of sampling}

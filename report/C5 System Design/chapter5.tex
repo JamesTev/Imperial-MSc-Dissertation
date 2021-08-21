@@ -214,14 +214,43 @@ After much experimentation and difficulty finding an analytical solution that co
 The simple but elegant power iteration algorithm explored in Section \ref{subsection:power-iteration-c3} can easily be implemented in firmware. The pseudocode for this algorithm is provided in Algorithm \ref{alg:power-iteration}. The corresponding MicroPython implementation is documented in Listing \ref{app-listing:power-iteration-mpy}.
 \begin{algorithm}
 \begin{algorithmic}
-\State Pick an initial vector $\vv^{(0)}$ with $\|\vv^{(0)}\|=1$
-% \Require 
-\For{$k=1, 2, \dots, \, K$ }
-    \State $\vw \gets \vw = \mA\vv^{(k-1)}$
-    \State $\vv^{(k)} \gets \vw / \| \vw\|$
+\State Pick an initial vector $\vv^{(0)}$ with $\|\vv^{(0)}\|=1$ \Comment{Initial unit vector assigned randomly}
+\For{$k=1, 2, \dots, \, K$ } \Comment{repeat for $K$ iterations}
+    \State $\vw \gets \vw = \mA\vv^{(k-1)}$ \Comment{update eigenvector estimate}
+    \State $\vv^{(k)} \gets \vw / \| \vw\|$ \Comment{normalise new estimate}
 \EndFor
 \caption{Power iteration}\label{alg:power-iteration}
 
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Simultaneous iteration}
+
+\begin{algorithm}
+\begin{algorithmic}
+\State Pick an initial basis for $\{\vv^{(0)}, \dots, \vv^{(d)} \}$ for $\R^d$
+\State Construct the matrix $\mV = \left[\begin{array}{l|l|l}\vv_1^{(0)} & \dots & \vv_d^{(0)}\end{array}\right]$
+\State Obtain the factors $\mQ^{(0)}\mR^{(0)} = \mV^{(0)}$ \Comment{compute QR factorisation of $\mV^{(0)}$}
+% \Require 
+\For{$k=1, 2, \dots, \, K$ }
+    \State $\mW \gets \mW = \mA\mQ^{(k-1)}$
+    \State Obtain the factors $\mQ^{(k)}\mR^{(k)} = \mW$ \Comment{extract orthonormal column vectors of $\mW$ from $\mQ^{(k)}$}
+\EndFor
+\caption{Simultaneous iteration}\label{alg:simultaneous-iteration}
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{QR iteration}
+
+\begin{algorithm}
+\begin{algorithmic}
+\State $\mA^{(0)} \gets \mA$
+\For{$k=1, 2, \dots, \, K$ }
+    \State Obtain the factors $\mQ^{(k)}\mR^{(k)} = \mA^{(k-1)}$ \Comment{perform QR factorisation on $\mA^{(k-1)}$}
+    \State $\mA^{(k)} \gets \mR^{(k)}\mQ^{(k)}$ \Comment{update step detailed in \cite{panju-iterative-eig}}
+\EndFor
+\caption{QR iteration}
+\label{alg:qr-iteration}
 \end{algorithmic}
 \end{algorithm}
 
