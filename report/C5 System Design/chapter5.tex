@@ -206,7 +206,7 @@ As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a m
 \section{Algorithm Implementation}
 
 \subsection{Eigenvalue algorithms}
-As elaborated on in Chapter \ref{chapter:theory-development}, the decoding algorithms explored in this project are all optimisation problems that can be reformulated as eigenvalue problems. Consequently, an `eigen' function capable of finding the eigenvalues (and corresponding eigenvectors) of an arbitrary matrix was crucial in the design of this system. The \texttt{ulab} module conveniently includes a basic eigen function of this sort: \texttt{numpy.linalg.eig(.)}. However, the severe limitation with this implementation is that it only works with \textit{symmetric} matrices (i.e. matrices with real eigenvalues). For signal decoding, many of the eigenvalue problems arising in this project involve asymmetric matrices. Thus, an alternative solution needed to be sought. 
+As elaborated on in Chapter \ref{chapter:theory-development}, the decoding algorithms explored in this project are all optimisation problems that can be reformulated as eigenvalue problems. Consequently, an `eigen' function capable of finding the eigenvalues (and corresponding eigenvectors) of an arbitrary matrix was crucial in the design of this system. The \texttt{ulab} module conveniently includes a basic eigen function of this sort: \texttt{numpy.linalg.eig()}. However, the severe limitation with this implementation is that it only works with \textit{symmetric} matrices (i.e. matrices with real eigenvalues). For signal decoding, many of the eigenvalue problems arising in this project involve asymmetric matrices. Thus, an alternative solution needed to be sought. 
 
 After much experimentation and difficulty finding an analytical solution that could work\footnote{produce the correct result and maintain numerical stability} under all conditions, it was decided that \textit{iterative} eigenvalue algorithms should be explored. 
 
@@ -242,27 +242,6 @@ The MicroPython implementation of the generalised eigenvalue in Algorithm \ref{a
 \label{algo:gen-eig-algo}
 \caption{Generalised eigenvalue algorithm}
 \end{algorithm}
-
-\begin{algorithm}
-\caption{An algorithm with caption}\label{alg:cap}
-\begin{algorithmic}
-\Require $n \geq 0$
-\Ensure $y = x^n$
-\State $y \gets 1$
-\State $X \gets x$
-\State $N \gets n$
-\While{$N \neq 0$}
-\If{$N$ is even}
-    \State $X \gets X \times X$
-    \State $N \gets \frac{N}{2}$  \Comment{This is a comment}
-\ElsIf{$N$ is odd}
-    \State $y \gets y \times X$
-    \State $N \gets N - 1$
-\EndIf
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
-
 
 Discuss numerical challenges, precision issues, memory constraints
 Discuss some of the auxiliary computational approaches used such as eigenvalue solvers etc
