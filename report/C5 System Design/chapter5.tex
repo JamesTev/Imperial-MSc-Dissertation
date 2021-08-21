@@ -206,9 +206,26 @@ As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a m
 \section{Algorithm Implementation}
 
 \subsection{Eigenvalue algorithms}
+As elaborated on in Chapter \ref{chapter:theory-development}, the decoding algorithms explored in this project are all optimisation problems that can be reformulated as eigenvalue problems. Consequently, an `eigen' function capable of finding the eigenvalues (and corresponding eigenvectors) of an arbitrary matrix was crucial in the design of this system. The \texttt{ulab} module conveniently includes a basic eigen function of this sort: \texttt{numpy.linalg.eig(.)}. However, the severe limitation with this implementation is that it only works with \textit{symmetric} matrices (i.e. matrices with real eigenvalues). For signal decoding, many of the eigenvalue problems arising in this project involve asymmetric matrices. Thus, an alternative solution needed to be sought. 
 
+After much experimentation and difficulty finding an analytical solution that could work\footnote{produce the correct result and maintain numerical stability} under all conditions, it was decided that \textit{iterative} eigenvalue algorithms should be explored. 
 
-\subsubsection{Generalised eigenvalue algorithms}
+\subsubsection{Power iteration}
+The simple but elegant power iteration algorithm explored in Section \ref{subsection:power-iteration-c3} can easily be implemented in firmware. The pseudocode for this algorithm is provided in Algorithm \ref{alg:power-iteration}. The corresponding MicroPython implementation is documented in Listing \ref{app-listing:power-iteration-mpy}.
+\begin{algorithm}
+\begin{algorithmic}
+\State Pick an initial vector $\vv^{(0)}$ with $\|\vv^{(0)}\|=1$
+% \Require 
+\For{$k=1, 2, \dots, \, K$ }
+    \State $\vw \gets \vw = \mA\vv^{(k-1)}$
+    \State $\vv^{(k)} \gets \vw / \| \vw\|$
+\EndFor
+\caption{Power iteration}\label{alg:power-iteration}
+
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Generalised eigenvalue algorithm}
 
 The MicroPython implementation of the generalised eigenvalue in Algorithm \ref{algo:gen-eig-algo} can be found in Listing \ref{app-listing:gen-eig-prob-mpy} in Appendix \ref{app-listing:gen-eig-prob-mpy}.
 

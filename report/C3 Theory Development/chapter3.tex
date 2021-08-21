@@ -53,7 +53,39 @@ where $\Lambda \in \R^{d\times d}$ is a diagonal matrix whose diagonal entries a
 \end{align}
 The diagonal elements of $\Lambda$ are the eigenvalues of $\mA$ and are arranged in descending order for the maximisation problem and ascending order for the minimisation problem. The columns of $\mW$ are the corresponding eigenvectors.
 
-\section{Theoretical Development of SSVEP Decoding Algorithms}
+\subsection{Power iteration}
+\label{subsection:power-iteration-c3}
+The power iteration algorithm is a simple iterative algorithm used to find the eigenvector $\vq_1 \in \R^d$ corresponding to the largest eigenvalue of a matrix $A\in \R^{d\times d}$ \cite{panju-iterative-eig}. It relies on the property that if $\vq$ is an eigenvector of matrix $\mA$ with eigenvalue $\lambda$, then $\mA^k \vq = \lambda^k\vq, \quad k\in \mathbb{N}$. Let unit vector $\vv^{(0)}$ be the initial estimate of an eigenvector of $\mA$. Writing $\vv^{(0)}$ as a linear combination of the eigenvectors $\vq_i$ of $\mA$:
+\begin{equation}
+    \vv^{(0)} = \sum_{i=1}^{d} c_i\vq_i \quad \text{for} \quad c_i \in \R, \, \forall i
+\end{equation}
+Assuming that $c_1 \neq 0$:
+\begin{equation}
+\begin{aligned}
+\mA \vv^{(0)} &= \sum_{i=1}^{d} c_i\lambda_i\vq_i \implies
+\mA^{k} \vv^{(0)} = \sum_{i=1}^{d} c_i\lambda_i^k\vq_i
+\end{aligned}
+\end{equation}
+Then, taking $\lambda_1^k$ as a common factor,
+\begin{equation}
+   \mA^{k} \vv^{(0)} = \lambda_{1}^{k}\left(c_{1} \vq_{1}+c_{2}\left(\frac{\lambda_{2}}{\lambda_{1}}\right)^{k} \vq_{2}+\ldots+c_{n}\left(\frac{\lambda_{n}}{\lambda_{1}}\right)^{k} \vq_{n}\right)
+\end{equation}
+Assuming that the eigenvalues $\lambda_i$ are assumed to be real, distinct and descending in magnitude, it is clear to see that for $i = 2, \dots, d$,
+\begin{equation}
+    \lim _{k \rightarrow \infty}\left(\frac{\lambda_{i}}{\lambda_{1}}\right)^{k}=0
+\end{equation}
+Thus, over multiple iterations (increasing $k$), $\mA \vv^{(0)} \rightarrow c_1\lambda_1^k \vq_1$ and $\vv^{(k)}$ approaches the eigenvector $\vq_1$:
+\begin{equation}
+    \vq_1 \approx \frac{\mA \vv^{(0)} }{\|\mA \vv^{(0)} \|}
+\end{equation}
+An approximation of the eigenvalue corresponding to $\vq_1$ can be found using the Rayleigh quotient for $\vv^{(k)}$ defined as 
+\begin{equation}
+    r(\vv) = \frac{\vv^\top \mA \vv}{\vv^\top \vv} \approx \frac{\lambda \vv^\top \vv}{\vv^\top \vv} = \lambda,
+\label{eq:rayleigh-quotient}
+\end{equation}
+where the iteration index $k$ has been omitted for readability. Although elegant, this algorithm is limited in that it only returns a single eigenvector and only converges if eigenvalues $\lambda_1, \lambda_2, \dots$ are \textit{distinct}. However, for problems that only require solving of the largest eigenvalue/eigenvector, this is a useful algorithm that is easy to implement.
+
+\section{SSVEP Decoding Algorithms}
 As mentioned in Section \ref{subsection:psda-vs-cca}, statistical algorithms selected or designed for SSVEP decoding have proven to be significantly more successful than PSDA approaches. Therefore, only the former will be explored in this section.
 
 \subsection{Canonical correlation analysis (CCA)}
