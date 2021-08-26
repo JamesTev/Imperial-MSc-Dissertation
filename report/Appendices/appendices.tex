@@ -7,15 +7,10 @@
 % \setlength{\voffset}{0cm}
 % \setlength{\hoffset}{0cm}
 
-\section{EEG Hardware Schematics}
-
-\label{appendix:schematics}
-\includepdf[pages=-]{schematics.PDF}
-
 \section{Firmware Implementations}
 \label{app:firmware}
 
-\begin{listing}[h]
+\begin{listing}[!htb]
 \small
 \begin{minted}{python}
 from ulab import numpy as np
@@ -43,7 +38,7 @@ def power_iteration(A, iterations):
 \label{app-listing:power-iteration-mpy}
 \end{listing}
 
-\begin{listing}[h]
+\begin{listing}[!htb]
 \small
 \begin{minted}{python}
 from ulab import numpy as np
@@ -81,3 +76,8 @@ def solve_gen_eig_prob(A, B, eps=1e-6):
 \end{listing}
 % \setlength{\voffset}{-2.54cm}
 % \setlength{\hoffset}{-2.54cm}
+
+\section{EEG Hardware Schematics}
+
+\label{appendix:schematics}
+\includepdf[pages=-]{schematics.PDF}
