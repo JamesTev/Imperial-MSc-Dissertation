@@ -9,6 +9,8 @@
 \section{Hardware Verification and Testing}
 \subsection{Digital signal processing system}
 
+All results shown below were computed using signals acquired directly from onboard hardware, i.e. all DSP operations (sampling, filtering, resampling) were computed on the device itself.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{sq_wave_filtering_time}
@@ -40,7 +42,7 @@
 \subfloat[eyes closed]{%
   \includegraphics[clip,width=\columnwidth]{eyes_closed_alpha_spectra_N1024.pdf}%
 }
-\caption[\textbf{Alpha band test}: periodograms showing $N=1024$ point PSD estimates for EEG signals measured from a subject in two distinct states: with eyes open and eyes closed.]{\textbf{Alpha band test}: periodograms showing $N=1024$ point PSD estimates for EEG signals measured from a subject in two distinct states: with eyes open and eyes closed. Data was acquired using the early hardware prototype in Figure \ref{fig:frakenstein-hardware}. Attention should be given to signal power around $8-10$Hz (alpha band). In both (a) and (b), the left subplot shows a standard, non-windowed periodogram accompanied by a Welch-averaged periodogram to the right. Different coloured traces represent independent trials.}
+\caption[Alpha band test: periodograms showing $N=1024$ point PSD estimates for EEG signals measured from a subject in two distinct states: with eyes open and eyes closed.]{\textbf{Alpha band test}: periodograms showing $N=1024$ point PSD estimates for EEG signals measured from a subject in two distinct states: with eyes open and eyes closed. Data was acquired using the early hardware prototype in Figure \ref{fig:frakenstein-hardware}. Attention should be given to signal power around $8-10$Hz (alpha band). In both (a) and (b), the left subplot shows a standard, non-windowed periodogram accompanied by a Welch-averaged periodogram to the right. Different coloured traces represent independent trials.}
 \end{figure}
 
 
@@ -70,7 +72,7 @@
     \label{subfig:gcca-nt-ns256}
 }
 
-\caption[\textbf{GCCA decoding accuracy}: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$.]{\textbf{GCCA decoding accuracy}: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$. In each subfigure, all trials are of equal length $T$ seconds which equates to $N_s$ samples at $f_s=256$Hz and $N_s'$ samples at the downsampled rate of $f_s'=64$Hz. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given $N_t=n, \, n\in\{1, \dots, 5\}$.}
+\caption[GCCA decoding accuracy: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$.]{\textbf{GCCA decoding accuracy}: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$. In each subfigure, all trials are of equal length $T$ seconds which equates to $N_s$ samples at $f_s=256$Hz and $N_s'$ samples at the downsampled rate of $f_s'=64$Hz. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given $N_t=n, \, n\in\{1, \dots, 5\}$.}
 \label{fig:gcca-acc-nt}
 \end{figure}
 
@@ -98,7 +100,7 @@
     \label{subfig:mset-nt-ns256}
 }
 
-\caption[\textbf{MsetCCA decoding accuracy}: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$.]{\textbf{MsetCCA decoding accuracy}: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$. In each subfigure, all trials are of equal length $T$ seconds which equates to $N_s$ samples at $f_s=256$Hz and $N_s'$ samples at the downsampled rate of $f_s'=64$Hz. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given $N_t=n, \, n\in\{1, \dots, 5\}$.}
+\caption[MsetCCA decoding accuracy: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$.]{\textbf{MsetCCA decoding accuracy}: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$. In each subfigure, all trials are of equal length $T$ seconds which equates to $N_s$ samples at $f_s=256$Hz and $N_s'$ samples at the downsampled rate of $f_s'=64$Hz. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given $N_t=n, \, n\in\{1, \dots, 5\}$.}
 \label{fig:mset-acc-nt}
 \end{figure}
 
@@ -125,7 +127,7 @@
     \label{subfig:gcca-ns-nt4}
 }
 
-\caption[\textbf{GCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{GCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
+\caption[GCCA decoding accuracy: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{GCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
 \label{fig:gcca-acc-ns}
 \end{figure}
 
@@ -152,7 +154,7 @@
     \label{subfig:mcca-ns-nt4}
 }
 
-\caption[\textbf{MsetCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{MsetCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
+\caption[MsetCCA decoding accuracy: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{MsetCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
 \label{fig:mcca-acc-ns}
 \end{figure}
 

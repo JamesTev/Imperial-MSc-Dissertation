@@ -151,3 +151,19 @@ linkcolor=black,
 colorlinks=true,
 citecolor=black,
 filecolor=black]{hyperref}
+
+% abstract environment
+\makeatletter
+\renewenvironment{abstract}{%
+    \if@twocolumn
+      \section*{\abstractname}%
+    \else %% <- here I've removed \small
+      \begin{center}%
+        {\bfseries \LARGE \abstractname\vspace{\z@}}%  %% <- here I've added \Large
+      \end{center}%
+      \vspace{0.5cm}
+      \noindent
+      \quotation
+    \fi}
+    {\if@twocolumn\else\endquotation\fi}
+\makeatother
