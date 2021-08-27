@@ -54,6 +54,7 @@ The analogue signal $x(t)$ is digitised to $x_1[n]$ using the 12-bit SAR ADC on-
 Figure \ref{fig:ssvep-bands} shows a high-level view of the sampling and filtering requirements of the system taking into account EEG and SSVEP dynamics, as well as restrictions specific to this project such as memory constraints. 
 
 \subsubsection{Digital filtering}
+\label{subsection:digital-filtering}
 As indicated in Figure \ref{fig:ssvep-bands}, an ideal low-pass filter for this system would achieve zero pass-band distortion (ripple) between 7 and $24$Hz and steep roll-off after $f_c=26$Hz to achieve complete signal attenuation before the Nyquist frequency $f_n=32$Hz. Obviously, this is not physically realisable and so a trade-off between maximising filter roll-off and minimising pass-band ripple must be sought.  
 
 Infinite impulse response (IIR) filters are typically more suitable for small, resource-constrained DSP systems. Compared to finite impulse response (FIR) filters, they generally offer:
