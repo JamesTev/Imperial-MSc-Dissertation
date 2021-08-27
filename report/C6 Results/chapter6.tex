@@ -19,7 +19,6 @@ As explained in Section \ref{fig:digital-system-c5}, the DSP system is crucial f
 
 All results reported below were computed on the hardware itself, i.e.: all DSP operations (sampling, filtering, resampling) were computed on-device as would happen in a real application. Figures were then plotted using \texttt{Matplotlib}, an open source Python library.
 
-\subsubsection{Sampling}
 Figure \ref{fig:sq-wave-time-c6} shows the filtered signal $y[n]$ against the measured input square wave $x[n]$. From visual inspection, $x[n]$ appears to have very consistent frequency and amplitude as desired. $y[n]$ shows marginal phase lag and slight inconsistencies in amplitude compared to the ideal output $y^*[n] = \frac{4}{\pi}\sin(2\pi f_x^{(0)}n)$. However, these slight deviations are certainly tolerable and would make little to no difference to the success of subsequent decoding algorithms.
 
 \begin{figure}[h]
@@ -29,7 +28,6 @@ Figure \ref{fig:sq-wave-time-c6} shows the filtered signal $y[n]$ against the me
     \label{fig:sq-wave-time-c6}
 \end{figure}
 
-\subsubsection{Filtering}
 Figure \ref{fig:sq-wave-spectra-c6} shows PSD estimates $\hat{P}_x(\omega)$ and $\hat{P}_y(\omega)$ of $x[n]$ and $y[n]$ respectively in the form of periodograms. Confirming the time domain representation in Figure \ref{fig:sq-wave-time-c6}, $\hat{P}_x(\omega)$ shows power peaks at the odd numbered harmonics of $x[n]$. This can be explained by the Fourier series expansion of an ideal square wave at fundamental frequency $f^{(0)}$ with 50\% duty cycle:
 \begin{equation}
     x[n]=\frac{4}{\pi} \sum_{k=1}^{\infty} \frac{\sin (2 \pi(2 k-1) f^{(0)} n)}{2 k-1},
@@ -46,14 +44,14 @@ While not quite impulses, power peaks of $\hat{P}_x(\omega)$ in Figure \ref{fig:
     \label{fig:sq-wave-spectra-c6}
 \end{figure}
 
-\subsubsection{Downsampling}
-
+Along with $\hat{P}_x(\omega)$ as before, Figure \ref{fig:sq-wave-ds-spectra-c6} shows the estimated spectra $\hat{P}_z(\omega)$ and $\hat{P}_\text{alias}(\omega)$ of $z[n]$. $\hat{P}_z(\omega)$ corresponds to the downsampled version of the filtered output $y[n]$ and $\hat{P}_\text{alias}(\omega)$ is the estimated spectrum of $x[n]$ after being downsampled with \textit{no} prior filtering. Both resampled signals were downsampled by a factor of 4 to $f_s'=64$Hz. As is particularly evident from the artefacts at 4Hz, 20Hz and 27Hz in the Welch-averaged periodogram in Figure \ref{fig:sq-wave-ds-spectra-c6}, aliasing has occurred in $\hat{P}_\text{alias}(\omega)$. The full spectrum of $\hat{P}_x(\omega)$ in Figure \ref{fig:sq-wave-spectra-c6} explains this behaviour: $x[n]$ contains substantial energy at higher frequencies past $f>f_n'=32$Hz where $f_n'$ is the Nyquist frequency for the downsampled rate of $f_n'=64$Hz. This demonstrates the necessity for low-pass filtering to isolate the frequency band of interest before downsampling. 
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{sq_wave_filtering_ds_spectra}
     \caption[PSD estimates of an input signal, filtered and downsampled version and a downsampled version without filtering.]{Standard periodogram (left) and Welch-averaged periodogram (right) representing PSD estimates $\hat{P}_x(\omega)$ and $\hat{P}_z(\omega)$ of input $x[n]$ and filtered, downsampled output $z[n]$ respectively. $\hat{P}_{\text{alias}}(\omega)$ shows the estimated spectrum of a downsampled version of $x[n]$ \textit{without} prior low-pass filtering}.
     \label{fig:sq-wave-ds-spectra-c6}
 \end{figure}
+On the other hand, Figure \ref{fig:sq-wave-ds-spectra-c6} also demonstrates the effectiveness of the DSP system as a whole: with suitable low-pass filtering, the spectrum of the downsampled signal $z[n]$ in the pass-band between 0 and 24Hz agrees very closely with that of the original signal $x[n]$. The implication of this is that 4x fewer samples can be used to represent $x[n]$ with negligible loss of information. This is invaluable for a system such as the one in this project that is severely constrained in memory and computational power.
 
 \subsection{Hardware and data acquisition}
 
