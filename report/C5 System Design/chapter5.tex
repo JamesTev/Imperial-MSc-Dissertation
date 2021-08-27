@@ -79,7 +79,7 @@ Figure \ref{fig:digital-filt-resp} shows the frequency response of three differe
     \caption[Frequency response of the digital low-pass filter implemented in firmware on the ESP32]{Frequency response of the digital low-pass filter implemented in firmware on the ESP32. The pre-filtered Nyquist frequency in this implementation is 128Hz: half the 256Hz sampling frequency.}
     \label{fig:digital-filt-resp}
 \end{figure}
-Observing the magnitude plot in the to half of Figure \ref{fig:digital-filt-rep}, it is evident that the response of the elliptic filter offers the optimal balance of steep roll-off between pass and stop bands and acceptable ripple in the stop and pass bands. This is intuitive: as $r_p$ approaches zero, the elliptical filter becomes a Chebyshev type II filter. As $r_s$ approaches zero, it becomes a Chebyshev type I filter. The phase response of the elliptical filter is also largely linear in the pass-band. For these reasons, a $10^{\textrm{th}}$ order elliptical low-pass filter satisfying the aforementioned design requirements was selected.
+Observing the magnitude plot in the to half of Figure \ref{fig:digital-filt-resp}, it is evident that the response of the elliptic filter offers the optimal balance of steep roll-off between pass and stop bands and acceptable ripple in the stop and pass bands. This is intuitive: as $r_p$ approaches zero, the elliptical filter becomes a Chebyshev type II filter. As $r_s$ approaches zero, it becomes a Chebyshev type I filter. The phase response of the elliptical filter is also largely linear in the pass-band. For these reasons, a $10^{\textrm{th}}$ order elliptical low-pass filter satisfying the aforementioned design requirements was selected.
 
 \section{Embedded Firmware}
 As alluded to in Section \ref{subsection:electronic-hardware-proto}, all firmware for this system was to be developed for the ESP32 SoC developed by Espressif Systems. Espressif offers a comprehensive \href{https://github.com/espressif/esp-idf}{open source} framework called the Espressif IoT Development Framework (ESP-IDF) that can be used to develop ESP32-based applications on Windows, Linux and macOS using C and C++ programming languages. Furthermore, ESP-IDF tooling has been extended to be used with the popular open source platform Arduino. While the ESP-IDF has arguably become the de facto standard for developing complex embedded applications for the ESP32, a different approach was taken in this project for reasons explored below. 
@@ -126,7 +126,7 @@ As alluded to above, a very convenient feature of MicroPython is its intuitive m
 .3 log-17082021-1.json.
 .3 log-10072021.txt.
 }
-The root directory contains two important files - \texttt{boot.py} and \texttt{main.py} - that are run in sequence at boot time. The \texttt{boot.py} script is typically used for internal system processes and \texttt{main.py} is used for any user functionality that should automatically be run at boot. Also in the root directory is the \texttt{.env} file which can be used to store sensitive environment variables such as Wi-Fi passwords or API key strings. The \texttt{lib} directory (package) contains the modules that implement the actual functionality of the digital system, including peripheral management, decoding and computation and networking (note that not all modules are shown above). Amazon AWS key files and certificates for secure MQTT communication are stored in the \texttt{certificates} folder. Finally, a \texttt{logs} directory shows how log files can also be very conveniently stored in arbitrary formats such as \texttt{.json} or \texttt{.txt} in non-volatile flash memory. Listing \ref{listing:dir-structure} below demonstrates how user-specific modules and files can be imported and used within a new script once flashed to the microcontroller's non-volatile memory. 
+The root directory contains two important files - \texttt{boot.py} and \texttt{main.py} - that are run in sequence at boot time. The \texttt{boot.py} script is typically used for internal system processes and \texttt{main.py} is used for any user functionality that should automatically be run at boot. Also in the root directory is the \texttt{.env} file which can be used to store sensitive environment variables such as Wi-Fi passwords or API key strings. The \texttt{lib} directory (package) contains the modules that implement the actual functionality of the digital system, including peripheral management, decoding and computation and networking (note that not all modules are shown above). Amazon Web Services (AWS) key files and certificates for secure MQTT communication are stored in the \texttt{certificates} folder. Finally, a \texttt{logs} directory shows how log files can also be very conveniently stored in arbitrary formats such as \texttt{.json} or \texttt{.txt} in non-volatile flash memory. Listing \ref{listing:dir-structure} below demonstrates how user-specific modules and files can be imported and used within a new script once flashed to the microcontroller's non-volatile memory. 
 
 \begin{listing}[h]
 \begin{minted}{python}
@@ -149,9 +149,9 @@ with open('/logs/log-10072021.txt') as f:
 \end{listing}
 
 \subsection{Numerical computation}
-An additional important motivation for using MicroPython over the more traditional C/C++ approach is the ability to use an extremely convenient open source MicroPython module called \texttt{ulab}\footnote{Source code and documentation available \href{https://github.com/v923z/micropython-ulab}{here}.} The \texttt{ulab} project was created to offer a subset of the very popular \texttt{numpy} numerical computing library for Python which offers highly performant array computing and linear algebra functionality. It also implements a small subset of functionality offered by \textt{scipy}; the equally popular scientific computing library for Python. Some of the most notable features offered by this module include \cite{ulab}:
+An additional important motivation for using MicroPython over the more traditional C/C++ approach is the ability to use an extremely convenient open source MicroPython module called \texttt{ulab}\footnote{Source code and documentation available \href{https://github.com/v923z/micropython-ulab}{here}.}. The \texttt{ulab} project was created to offer a subset of the very popular \texttt{numpy} numerical computing library for Python which offers highly performant array computing and linear algebra functionality. It also implements a small subset of functionality offered by \textt{scipy}; the equally popular scientific computing library for Python. Some of the most notable features offered by this module include \cite{ulab}:
 \begin{enumerate}
-    \item compact, iterable and sliceable arrays structures for numerical data up to 4 dimensions
+    \item compact, iterable and sliceable array structures for numerical data up to 4 dimensions
     \item extremely frugal with RAM usage
     \item efficient, vectorised computations on multi-dimensional arrays
     \item basic linear algebra functionality such as matrix inversion, multiplication, determinants, Cholesky and QR decomposition
@@ -164,7 +164,7 @@ Being able to perform matrix and array operations, filtering and numerical appro
 \begin{listing}[h]
 \small
 \begin{minted}{python}
-# import ulab module
+# import ulab numpy module
 from ulab import numpy as np
 
 # create an arbitrary positive definite, symmetric 3x3 matrix
@@ -210,7 +210,7 @@ As elaborated on in Chapter \ref{chapter:theory-development}, the decoding algor
 
 After much experimentation and difficulty finding an analytical solution that could work\footnote{produce the correct result and maintain numerical stability} under all conditions, it was decided that \textit{iterative} eigenvalue algorithms should be explored. 
 
-\subsubsection{Power iteration}
+\subsubsection{Power Iteration}
 The simple but elegant power iteration algorithm explored in Section \ref{subsection:power-iteration-c3} can easily be implemented in firmware. The pseudocode for this algorithm is provided in Algorithm \ref{alg:power-iteration}. The corresponding MicroPython implementation is documented in Listing \ref{app-listing:power-iteration-mpy}.
 \begin{algorithm}
 \begin{algorithmic}
@@ -219,13 +219,13 @@ The simple but elegant power iteration algorithm explored in Section \ref{subsec
     \State $\vw \gets \vw = \mA\vv^{(k-1)}$ \Comment{update eigenvector estimate}
     \State $\vv^{(k)} \gets \vw / \| \vw\|$ \Comment{normalise new estimate}
 \EndFor
-\caption{Power iteration}\label{alg:power-iteration}
-
 \end{algorithmic}
+\caption{Power iteration}
+\label{alg:power-iteration}
 \end{algorithm}
 
-\subsubsection{Simultaneous iteration}
-
+\subsubsection{Simultaneous Iteration}
+As discussed in Section \ref{subsection:simultaneous-iteration}, the Simultaneous Iteration algorithm provides an effective extension of Power Iteration by solving for all eigenvectors simultaneously. The pseudocode for the implementation of this algorithm is given in Algorithm \ref{alg:simultaneous-iteration}.
 \begin{algorithm}
 \begin{algorithmic}
 \State Pick an initial basis for $\{\vv^{(0)}, \dots, \vv^{(d)} \}$ for $\R^d$
@@ -236,12 +236,13 @@ The simple but elegant power iteration algorithm explored in Section \ref{subsec
     \State $\mW \gets \mW = \mA\mQ^{(k-1)}$
     \State Obtain the factors $\mQ^{(k)}\mR^{(k)} = \mW$ \Comment{extract orthonormal column vectors of $\mW$ from $\mQ^{(k)}$}
 \EndFor
-\caption{Simultaneous iteration}\label{alg:simultaneous-iteration}
 \end{algorithmic}
+\caption{Simultaneous iteration}
+\label{alg:simultaneous-iteration}
 \end{algorithm}
 
-\subsubsection{QR iteration}
-
+\subsubsection{QR Iteration}
+Finally, as revealed in Section \ref{subsection:qr-iteration}, the QR Iteration algorithm is a more convenient form of the Simultaneous Iteration algorithm that is more commonly used in practice. Pseudocode for its implementation in this project is given in Algorithm \ref{alg:qr-iteration}.
 \begin{algorithm}
 \begin{algorithmic}
 \State $\mA^{(0)} \gets \mA$
@@ -249,14 +250,19 @@ The simple but elegant power iteration algorithm explored in Section \ref{subsec
     \State Obtain the factors $\mQ^{(k)}\mR^{(k)} = \mA^{(k-1)}$ \Comment{perform QR factorisation on $\mA^{(k-1)}$}
     \State $\mA^{(k)} \gets \mR^{(k)}\mQ^{(k)}$ \Comment{update step detailed in \cite{panju-iterative-eig}}
 \EndFor
+\end{algorithmic}
 \caption{QR iteration}
 \label{alg:qr-iteration}
-\end{algorithmic}
 \end{algorithm}
+The MicroPython implementation of this algorithm is presented in Listing \ref{app-listing:qr-iteration-mpy} in Appendix \ref{app:firmware}.
 
 \subsubsection{Generalised eigenvalue algorithm}
-
-The MicroPython implementation of the generalised eigenvalue in Algorithm \ref{algo:gen-eig-algo} can be found in Listing \ref{app-listing:gen-eig-prob-mpy} in Appendix \ref{app-listing:gen-eig-prob-mpy}.
+The generalised eigenvalue problem for two symmetric matrices $\mA, \, \mB \in \R^{d \times d}$ is given by the form
+\begin{equation}
+    \mA\vx_{i}=\lambda_{i} \mB \vx_{i}, \quad \forall i \in\{1, \ldots, d\},
+    \label{eq:gen-eig-problem}
+\end{equation}
+where $\vx_i$ and $\lambda_i$ are the eigenvectors and eigenvalues of the system respectively. This problem is relevant to several decoding algorithms explored in this project, including the GCCA and MsetCCA algorithms explored in Chapter \ref{chapter:theory-development}. The proof for solving for $\vx_i$ and $\lambda_i$ is involved but well known and is given in \cite{ghojogh-gen-eig-prob}. However, understanding the algorithm to solve this problem is crucial for enabling implementation in firmware. The generalised eigenvalue algorithm, extracted from \cite{ghojogh-gen-eig-prob}, is given in Algorithm \ref{alg:gen-eig-algo} below.
 
 \begin{algorithm}
 \begin{algorithmic}
@@ -268,10 +274,12 @@ The MicroPython implementation of the generalised eigenvalue in Algorithm \ref{a
 \State $\Phi \gets \Phi=\widetilde{\Phi}_{\mB} \Phi_{\mA}$ \Comment{compute generalised eigenvectors}
 \State return $\Phi$, $\Lambda$ \Comment{return the generalised eigenvector and eigenvalue matrices}
 \end{algorithmic}
-\label{algo:gen-eig-algo}
 \caption{Generalised eigenvalue algorithm}
+\label{alg:gen-eig-algo}
 \end{algorithm}
 
-Discuss numerical challenges, precision issues, memory constraints
+The MicroPython implementation of the generalised eigenvalue algorithm can be found in Listing \ref{app-listing:gen-eig-prob-mpy} in Appendix \ref{app:firmware}.
+
+\textbf{TODO:} Discuss numerical challenges, precision issues, memory constraints
 Discuss some of the auxiliary computational approaches used such as eigenvalue solvers etc
 

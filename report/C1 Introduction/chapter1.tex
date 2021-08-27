@@ -59,12 +59,9 @@ The EEG hardware provided by the NGNI Lab is based on the low-cost Espressif ESP
 Finally, every effort must be taken to use exclusively \textbf{open source} software, tools and other resources in developing this system. This will create a platform most suitable for the education space as it will afford the ability to easily modify, extend or deconstruct the system as a result of having accessible resources; both on a physical hardware/firmware level, as well as in the form of vast open source communities and documentation.
 
 \subsection{Constraint implications}
-The constraints listed above have substantial implications on my project. One of the largest constraints is the budget of £20; entry level consumer-grade BCIs (brain computer interfaces) typically cost in the region of $\$100-\$1000$. As a result, our device will only have \textbf{two active EEG channels}. Although most BCIs have many more active channels, many studies have shown that a viable decoding system can be achieved with only a limited number of channels \cite{Wang2011}, some with even as few as 2 \cite{acampora-dataset}. 
+The constraints listed above have substantial implications on my project. One of the largest constraints is the budget of £20; entry level consumer-grade BCIs (brain computer interfaces) typically cost in the region of several hundred USD. As a result, the device in this project will only have \textbf{two active electrodes} measured in a differential configuration to yield only a \textbf{single active channel}. Although most BCIs have many more active channels, many studies have shown that a viable decoding system can be achieved with only a limited number of channels \cite{Wang2011}, some with even as few as 2 \cite{acampora-dataset}. 
 
 The prohibition of wet electrodes is also significant. Wet electrodes are known to significantly improve the quality\footnote{by reducing contact impedance} of the electrical connection to the scalp which would invariably improve SNR. 
-
-The number of samples required for adequate frequency resolution is an important consideration. Initial analysis in the experiments outlined below showed that around 5 seconds worth of sampling at 256Hz was required to achieve adequate frequency resolution. Consequently, computation time is unlikely to be the limiting factor in achieving real time decoding.
-
 \section{Plan of Development}
 This report begins with a review of the basics of neurophysiology and how electrical signals are used by the human brain. An overview of the mechanics of electroencephalography (EEG) is presented, followed by some of the popular EEG paradigms explored in the literature. A particular paradigm is selected for further analysis. The current state-of-the-art in EEG signal decoding for the selected EEG paradigm is explored both from a technological and theoretical perspective. 
 
@@ -72,6 +69,6 @@ Chapter \ref{chapter:theory-development} expands on the theory of decoding algor
 
 Chapter \ref{chapter:system-design} explores the design of the embedded software required to execute the decoding algorithms introduced in the previous chapter. Auxiliary components, such as networking and communication infrastructure, are also explored. Computational challenges and the evolution of their solutions are presented. 
 
-Results of the implemented decoding system are provided in Chapter \ref{chapter:results}. Results obtained in various scenarios are documented, including decoding performance using: publicly available data benchmark data, data gathered using a low level commercially available OpenBCI headset and data using the final hardware prototype created as part of this project. 
+Results of the implemented decoding system are provided in Chapter \ref{chapter:results}. Results obtained in various scenarios are documented, including decoding performance using data gathered using a low level commercially available OpenBCI headset, as well as data using the final hardware prototype created as part of this project. 
 
 Finally, a discussion of the results obtained is provided in Chapter \ref{chapter:discussion-conclusion}. Conclusions are drawn and suggestions for improvement in further work are given. 

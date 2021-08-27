@@ -188,10 +188,10 @@ The first very basic test involved verifying the integrity of the firmware on bo
 As mentioned briefly in Section \ref{subsection:nature-of-eeg-signals}, EEG signal energy related to visual processing typically occurs in the \textit{alpha} band between 8 and 13Hz and can be measured around the occipital region of the brain. As alpha energy is pronounced when the eyes are closed and attenuated when they are open, this phenomenon can be used as a basic test of the validity of a BCI. If signal energy as measured by the BCI in the occipital region follows this pattern, it suggests that acquired signals are not simply random noise. It should be noted, however, that individuals show varying levels of alpha reactivity and the difference in energy under these two conditions may not be significant in all individuals. 
 
 \subsubsection{Digital signal processing tests}
-In order to test the integrity of digital signal processing (DSP) elements in the BCI system, the following preliminary checks were employed. Digital signal processing elements are explored more in detail in Chapter \ref{chapter:system-design}. In all of the following tests, data was recorded on the electronic hardware detailed above and was analysed offline.
+In order to test the integrity of digital signal processing (DSP) elements in the BCI system (explored more in detail in Chapter \ref{chapter:system-design}), the following preliminary checks were employed. In all of the following tests, data was recorded on the electronic hardware detailed above and was analysed offline.
 \begin{itemize}
     \item in order to test the on-device digital low-pass filter, data was recorded with and without the filter active. Analysis was performed to verify that signal components beyond the target frequency band were suitably attenuated and that pass-band distortion was acceptable. 
-    \item in order to verify the equivalence between original and down-sampled versions of the same signal, data was collected under three conditions: (i) sampling at $f_s=256$Hz with low pass filtering 
+    \item in order to verify the equivalence between original and down-sampled versions of the same signal, data was collected under three conditions: (i) sampling at $f_s=256$Hz with low pass filtering but no downsampling, (ii) sampling at $f_s=256$Hz with low pass filtering and downsampling to $f_s'=64$Hz and (iii) sampling at $f_s=256$Hz with \textit{no} low-pass filtering and downsampling to $f_s'=64$Hz.
 \end{itemize}
 
 \subsubsection{Artificial signal decoding test}
