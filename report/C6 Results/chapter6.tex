@@ -73,6 +73,81 @@ As mentioned in Chapter \ref{chapter:experimental-procedure}, the rudimentary he
 Figure \ref{fig:alpha-periodograms} shows the estimated power spectra recorded over several trials in each of the two aforementioned states. Particularly around 8Hz, Subfigure \ref{subfig:alpha-eyes-closed} representing the eyes closed state shows noticeably more signal power in the alpha band relative to the rest of the signal (compared to the eyes open state). This is suggestive of the presence of valid EEG signals as opposed to just random noise.
 
 \section{Experimental Decoding Results}
+In this section, the experimental results of various decoding algorithms introduced in Chapter \ref{chapter:lit-review} are reported. Unfortunately, because only single channel EEG signals were available using the hardware provided in this project, the TRCA algorithm was no longer appropriate. This is due to the fact that it tries to find optimal \textit{spatial} filters for task-related discrimination; effectively optimally-weighted combinations of multiple channels. Clearly, having only a single channel renders this approach ineffective. 
+
+The decoding results of the CCA algorithm are presented briefly, however, greater attention is paid to those of the GCCA and MsetCCA algorithms. The latter two algorithms use data from across trials to form a `reference template' in addition to the ordinary CCA method that only compares measured signals with the artificially-constructed sinusoidal reference set. 
+
+\subsubsection{Evaluation of results}
+Worth noting is the method used to evaluate results reported below. For template-based decoding algorithms (GCCA, MsetCCA), initial training or calibration is required using historical template data. The term `calibration' is preferred since in practice, calibration must happen automatically on the device and the term `training' is typically associated with offline model fitting.
+
+Leave-$p$-out cross-validation (LpO CV) was employed in order to minimise the risk of selection bias or overfitting to pathological test cases. Usually, LpO CV refers to \textit{training} a model on $n-p$ observations and \textit{validating} on the held-out $p$ validations (with $p<n$). However, in this project, template-based algorithms were instead \textit{calibrated} on the smaller $p$-partition and validated on the remaining $n-p$ samples. This more appropriately reflects the practical dynamic of this system where only few calibration trials will be available before inference needs to begin.
+
+LpO CV was selected, as opposed to leave-one-out CV\footnote{a special case of LpO CV with $p=1$ that is more commonly used}, for example, as it provides the ability to vary $p$ in order to investigate the effect of more or fewer calibration trials on decoding performance. For $n$ trials or observations, LpO CV will generate $\binom{n}{p}$\footnote{This would generally become computationally infeasible for even modest $n$. However, the calibration or `training' processes for the algorithms in this project were not computationally intensive and the number of trials in each experiment never exceeded 10.} unique calibration-validation splits. Validation metrics, such as accuracy, are then averaged across all splits (unless otherwise stated). This is depicted more graphically in Figure \ref{fig:lpocv-diagram}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{LpoCV}
+    \caption[Leave-$p$-out cross validation (Lpo CV)]{Diagram illustrating leave-$p$-out cross validation (Lpo CV). Individual blocks in each row are different trials, each represented by a data matrix $X_n\in\R^{N_s\times N_c}$ where $N_s$ is the number of samples per trial and $N_c$ is the number of channels ($N_c=1$ in this project). For $n$ trials, there will be $\binom{n}{p}$ different calibration-validation splits (rows of blocks).}
+    \label{fig:lpocv-diagram}
+\end{figure}
+
+\subsection{The effect of recording window length}
+As alluded to in Section \ref{subsection:time-frequency-considerations-c2}, arguably the most important factor in the decoding system - besides the actual algorithm used - is the length of the recording window $T$. As cited in the literature review, decoding accuracy almost always improved with increasing $T$. This is expected; longer time windows offer more samples to the decoding algorithm being used. However, the trade off is decreased information transfer rate (ITR) which results in a more sluggish BCI system. 
+
+Figures \ref{fig:gcca-acc-nt} and \ref{fig:mset-acc-nt} show the effect of varying $T$ on decoding accuracy for the GCCA and MsetCCA algorithms respectively. For each algorithm, the effect of varying $T$ is tested with four different calibration scenarios with $N_t=1,\dots,4$ where $N_t$ is the number of training trials (equivalent to $p$ in the Lpo CV explanation). As expected, there is a monotonic increase in \textit{average} decoding accuracy (across stimulus frequencies for each trial) with increasing $T$. Clearly, there is also an interaction with the number of calibration trials $N_t$.
+
+%% [SAMPLING LENGTH] Experiments with varying Ns: GCCA
+\begin{figure}[htp]
+\subfloat[$N_t=1$]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt1.pdf}%
+    \label{subfig:gcca-ns-nt1}
+}
+\hfill
+\subfloat[$N_t=2$]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt2.pdf}%
+    \label{subfig:gcca-ns-nt2}
+}
+% ensure there is a space below here!
+
+\subfloat[$N_t=3$)]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt3.pdf}%
+    \label{subfig:gcca-ns-nt3}
+}
+\hfill
+\subfloat[$N_t=4$]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt4.pdf}%
+    \label{subfig:gcca-ns-nt4}
+}
+
+\caption[GCCA decoding accuracy: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{GCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
+\label{fig:gcca-acc-ns}
+\end{figure}
+
+%% [SAMPLING LENGTH] Experiments with varying Ns: MsetCCA
+\begin{figure}[htp]
+\subfloat[$N_t=1$]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt1.pdf}%
+    \label{subfig:mcca-ns-nt1}
+}
+\hfill
+\subfloat[$N_t=2$]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt2.pdf}%
+    \label{subfig:mcca-ns-nt2}
+}
+% ensure there is a space below here!
+
+\subfloat[$N_t=3$)]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt3.pdf}%
+    \label{subfig:mcca-ns-nt3}
+}
+\hfill
+\subfloat[$N_t=4$]{%
+    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt4.pdf}%
+    \label{subfig:mcca-ns-nt4}
+}
+
+\caption[MsetCCA decoding accuracy: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{MsetCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
+\label{fig:mcca-acc-ns}
+\end{figure}
 
 %% Experiments with varying Nt: GCCA
 \begin{figure}[htp]
@@ -128,60 +203,6 @@ Figure \ref{fig:alpha-periodograms} shows the estimated power spectra recorded o
 
 \caption[MsetCCA decoding accuracy: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$.]{\textbf{MsetCCA decoding accuracy}: effect of varying the number of training (calibration) trials $N_t$ on validation accuracy for recording windows of varying length $T$. In each subfigure, all trials are of equal length $T$ seconds which equates to $N_s$ samples at $f_s=256$Hz and $N_s'$ samples at the downsampled rate of $f_s'=64$Hz. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given $N_t=n, \, n\in\{1, \dots, 5\}$.}
 \label{fig:mset-acc-nt}
-\end{figure}
-
-%% [SAMPLING LENGTH] Experiments with varying Ns: GCCA
-\begin{figure}[htp]
-\subfloat[$N_t=1$]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt1.pdf}%
-    \label{subfig:gcca-ns-nt1}
-}
-\hfill
-\subfloat[$N_t=2$]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt2.pdf}%
-    \label{subfig:gcca-ns-nt2}
-}
-% ensure there is a space below here!
-
-\subfloat[$N_t=3$)]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt3.pdf}%
-    \label{subfig:gcca-ns-nt3}
-}
-\hfill
-\subfloat[$N_t=4$]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_gcca_Nt4.pdf}%
-    \label{subfig:gcca-ns-nt4}
-}
-
-\caption[GCCA decoding accuracy: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{GCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
-\label{fig:gcca-acc-ns}
-\end{figure}
-
-%% [SAMPLING LENGTH] Experiments with varying Ns: MsetCCA
-\begin{figure}[htp]
-\subfloat[$N_t=1$]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt1.pdf}%
-    \label{subfig:mcca-ns-nt1}
-}
-\hfill
-\subfloat[$N_t=2$]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt2.pdf}%
-    \label{subfig:mcca-ns-nt2}
-}
-% ensure there is a space below here!
-
-\subfloat[$N_t=3$)]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt3.pdf}%
-    \label{subfig:mcca-ns-nt3}
-}
-\hfill
-\subfloat[$N_t=4$]{%
-    \includegraphics[clip,width=0.49\columnwidth]{report/C6 Results/assets/acc_Ns_mcca_Nt4.pdf}%
-    \label{subfig:mcca-ns-nt4}
-}
-
-\caption[MsetCCA decoding accuracy: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$]{\textbf{MsetCCA decoding accuracy}: effect of varying recording window length $T$ on validation accuracy for different numbers of calibration trails $N_t$. In each subfigure, all results were computed using $N_t=n, \, n\in\{1, \dots, 4\}$ calibration trials. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given a given window length $T$.}
-\label{fig:mcca-acc-ns}
 \end{figure}
 
 % \begin{figure}
