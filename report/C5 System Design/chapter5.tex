@@ -130,6 +130,7 @@ As alluded to above, a very convenient feature of MicroPython is its intuitive m
 The root directory contains two important files - \texttt{boot.py} and \texttt{main.py} - that are run in sequence at boot time. The \texttt{boot.py} script is typically used for internal system processes and \texttt{main.py} is used for any user functionality that should automatically be run at boot. Also in the root directory is the \texttt{.env} file which can be used to store sensitive environment variables such as Wi-Fi passwords or API key strings. The \texttt{lib} directory (package) contains the modules that implement the actual functionality of the digital system, including peripheral management, decoding and computation and networking (note that not all modules are shown above). Amazon Web Services (AWS) key files and certificates for secure MQTT communication are stored in the \texttt{certificates} folder. Finally, a \texttt{logs} directory shows how log files can also be very conveniently stored in arbitrary formats such as \texttt{.json} or \texttt{.txt} in non-volatile flash memory. Listing \ref{listing:dir-structure} below demonstrates how user-specific modules and files can be imported and used within a new script once flashed to the microcontroller's non-volatile memory. 
 
 \begin{listing}[h]
+\small
 \begin{minted}{python}
 # import user-specific functions from non-volatile memory
 from lib.decoding import cca
@@ -203,9 +204,13 @@ Once processed and decoded, data from many BCI devices must be streamed to a cen
 
 As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a message broker (server) and several clients. In this case, the AWS IoT service acts as an MQTT broker that receives messages published by remote ESP32 BCI clients. Each of the clients have a unique client ID but subscribe to a common topic that the AWS service expects. Although the design of subsequent elements in the AWS cloud pipeline was not included in this project, a schematic representation is presented in Figure \ref{fig:networking-diagram-c5}: data received from BCI clients over MQTT is streamed to a web application that can be view in real time.
 
+\subsection{Logging}
+Discuss logging server and the potential for network logging ot anywhere
+
+\subsection{Digital filtering}
+Discuss method of generating filter weights offline and then using SOS stored in flash
 
 \section{Algorithm Implementation}
-
 \subsection{Eigenvalue algorithms}
 As elaborated on in Chapter \ref{chapter:theory-development}, the decoding algorithms explored in this project are all optimisation problems that can be reformulated as eigenvalue problems. Consequently, an `eigen' function capable of finding the eigenvalues (and corresponding eigenvectors) of an arbitrary matrix was crucial in the design of this system. The \texttt{ulab} module conveniently includes a basic eigen function of this sort: \texttt{numpy.linalg.eig()}. However, the severe limitation with this implementation is that it only works with \textit{symmetric} matrices (i.e. matrices with real eigenvalues). For signal decoding, many of the eigenvalue problems arising in this project involve asymmetric matrices. Thus, an alternative solution needed to be sought. 
 
@@ -281,6 +286,10 @@ where $\vx_i$ and $\lambda_i$ are the eigenvectors and eigenvalues of the system
 
 The MicroPython implementation of the generalised eigenvalue algorithm can be found in Listing \ref{app-listing:gen-eig-prob-mpy} in Appendix \ref{app:firmware}.
 
-\textbf{TODO:} Discuss numerical challenges, precision issues, memory constraints
-Discuss some of the auxiliary computational approaches used such as eigenvalue solvers etc
+\subsection{Decoding algorithms}
+\subsubsection{CCA}
+\subsubsection{GCCA}
+\subsubsection{MsetCCA}
+
+
 
