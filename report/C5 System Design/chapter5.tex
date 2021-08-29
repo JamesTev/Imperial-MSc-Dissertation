@@ -151,7 +151,7 @@ with open('/logs/log-10072021.txt') as f:
 \end{listing}
 
 \subsection{Numerical computation}
-An additional important motivation for using MicroPython over the more traditional C/C++ approach is the ability to use an extremely convenient open source MicroPython module called \texttt{ulab}\footnote{Source code and documentation available \href{https://github.com/v923z/micropython-ulab}{here}.}. The \texttt{ulab} project was created to offer a subset of the very popular \texttt{numpy} numerical computing library for Python which offers highly performant array computing and linear algebra functionality. It also implements a small subset of functionality offered by \textt{scipy}; the equally popular scientific computing library for Python. Some of the most notable features offered by this module include \cite{ulab}:
+An additional important motivation for using MicroPython over the more traditional C/C++ approach is the ability to use an extremely convenient open source MicroPython module called \texttt{ulab}\footnote{Source code and documentation available \href{https://github.com/v923z/micropython-ulab}{here}.}. The \texttt{ulab} project was created to offer a subset of the very popular \texttt{numpy} numerical computing library for Python which offers highly performant array computing and linear algebra functionality. It also implements a small subset of functionality offered by Scipy; the equally popular scientific computing library for Python. Some of the most notable features offered by this module include \cite{ulab}:
 \begin{enumerate}
     \item compact, iterable and sliceable array structures for numerical data up to 4 dimensions
     \item extremely frugal with RAM usage
@@ -232,17 +232,17 @@ Figure \ref{fig:web-logger-c5} provides an overview of the web-based logging sys
     "raw_data": [[ 0.02859, 0.054, ..., 0.345], # raw data for further offline analysis
                 [ 0.412, 0.001, ..., 0.345]]
 }
-
 \end{minted}
 \caption{Example JSON data payload sent from a remote ESP32 device via \texttt{POST} HTTP request to the logging server}
 \label{listing:logging-payload}
+
 \end{listing}
-The JSON object in Listing \ref{listing:logging-payload} shows an example of a data payload sent via an ESP32 client to the logging API. Decoded data, as well as raw data used to perform on-board decoding, is compiled into each data payload. Each payload is then sent via an HTTP \textt{POST} request to the logging server. Once received and verified by the API, data is written to a log file stored on the server. Note that in this project, the server and API were run on a local network and data was thus stored on a personal computer. However, the system would work identically if the server was deployed in the cloud. This would allow data to be logged by remote BCI devices from anywhere in the world and would not require users of the devices to run their own local server. This could facilitate a decentralised data acquisition system that could enable wide-scale data collection.  
+The JSON object in Listing \ref{listing:logging-payload} shows an example of a data payload sent via an ESP32 client to the logging API. Decoded data, as well as raw data used to perform on-board decoding, is compiled into each data payload. Each payload is then sent via an HTTP \texttt{POST} request to the logging server. Once received and verified by the API, data is written to a log file stored on the server. Note that in this project, the server and API were run on a local network and data was thus stored on a personal computer. However, the system would work identically if the server was deployed in the cloud. This would allow data to be logged by remote BCI devices from anywhere in the world and would not require users of the devices to run their own local server. This could facilitate a decentralised data acquisition system that could enable wide-scale data collection.  
 
 \subsection{Digital filtering}
 The digital low-pass filter described in Section \ref{subsection:digital-filtering} whose frequency response is shown in Figure \ref{fig:digital-filt-resp} was designed using \href{https://docs.scipy.org/doc/scipy/index.html}{SciPy}, the popular open source scientific computing library for Python. In particular, given the filter design requirements, the \texttt{scipy.signal.ellip()} function was used to generate filter coefficients. Using the \texttt{output==`sos'} argument, the filter coefficients were computed in a cascaded second-order sections (SOS) representation. The SOS representation of an IIR filter with digital transfer function $H(z)$ is as follows:
 \begin{equation}
-H(z)=K\prod_{n=0}^{N-1} \frac{b_{n,\, 0}+b_{n,\, 1} z^{-1}+b_{n,\, 2} z^{-2}}{1+a_{n,\, 1} z^{-1}+a_{n,\, 2}_{z}^{-2}},
+H(z)=K\prod_{n=0}^{N-1} \frac{b_{n,\, 0}+b_{n,\, 1} z^{-1}+b_{n,\, 2} z^{-2}}{1+a_{n,\, 1} z^{-1}+a_{n,\, 2}z^{-2}},
 \label{eq:sos-structure}
 \end{equation}
 where $K$ is a gain scalar, $N$ is the number of sections needed to realise the desired filter order and $a_n$ and $b_n$ are the reverse and forward coefficients for section $n$ respectively. Notice that in the form in (\ref{eq:sos-structure}), only a highest order of 2 is present for any component. This cascaded lower-order form offers greater numerical stability and less sensitivity to quantisation of coefficients than standard higher order polynomials.
@@ -327,8 +327,91 @@ The MicroPython implementation of the generalised eigenvalue algorithm can be fo
 
 \subsection{Decoding algorithms}
 \subsubsection{CCA}
+The implementation of the CCA algorithm introduced in Section \ref{subsection:CCA-c2} is demonstrated in Algorithm \ref{alg:cca}. The $\epsilon$ argument is used for numerical conditioning to ensure matrices $\mC_{\mX\mX}, \, \mC_{\mY\mY}$ are not singular prior to inversion. Typical values are in the range of $\epsilon\approx10^{-7}$. In the case of CCA for SSVEP decoding as in this project, the reference signal argument $\mY$ would be the harmonic reference signal as specified in Section \ref{subsection:CCA-c2}.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Function{ComputeCCA}{$\mX,\,\mY,\, \epsilon$} \Comment{Input signal $\mX \in \R^{N_c \times N_s}$ and ref. signal $\mY \in \R^{q\times N_s}, \, q\in \mathbb{N}$ }
+\State generate $\mY$ \Comment{Form harmonic reference set $\mY \in \R^{2N_h \times N_s}$}
+\State $\mC_{\mX\mX} \gets \mC_{\mX\mX} = \mX\mX^\top$ \Comment{Signal covariance matrix}
+\State $\mC_{\mY\mY} \gets \mC_{\mY\mY} = \mY\mY^\top$ \Comment{Reference covariance matrix}
+\State $\mC_{\mX\mY} \gets \mC_{\mX\mY} = \mX\mY^\top$ \Comment{Cross covariance matrix}
+\State $\mM \gets \mM = (\mC_{\mX\mX}+\epsilon)^{-1}\mC_{\mX\mY}(\mC_{\mY\mY}+\epsilon)^{-1}\mC_{\mX\mY}^\top$ \Comment{Store intermediate result in $\mM$}
+\State $\lambda^* \gets \mM\vw = \lambda\vw$ \Comment{Find maximum eigenvalue $\lambda^*$ of $\mM$ using Algorithm \ref{alg:qr-iteration}}
+\State return $\sqrt{\lambda^*}$ \Comment{Maximum canonical corr. is square root of $\lambda^*$}
+\EndFunction
+\end{algorithmic}
+\caption{CCA algorithm}
+\label{alg:cca}
+\end{algorithm}
+The MicroPython implementation of this algorithm is presented in Listing \ref{app-listing:cca-algo} in Appendix \ref{app:firmware}.
+
 \subsubsection{GCCA}
+\label{subsection:gcca-algo}
+The implementation of the GCCA algorithm introduced in Section \ref{subsection:gcca-c2} is demonstrated in Algorithm \ref{alg:gcca}. As this is a template-based algorithm that requires calibration or training data prior to inference, there are two distinct functions: \textsc{FitGCCA()} and \textsc{ComputeGCCA()}. The former must be executed before inference using the \textsc{ComputeGCCA()} function can begin.
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Function{FitGCCA}{$\tX$} \Comment{Input training/calibration data tensor $\tX \in \R^{N_c \times N_s \times N_t}$ }
+\State $\mX^{c} \gets \mX^{c} = \begin{bmatrix}
+    \mX_1^\top & \mX_2^\top & \dots & \mX_{N_t}^\top
+    \end{bmatrix}$
+\Comment{Form $\mX^c \in \R^{N_c \times (N_s N_t)} $ by concatenating trials $\mX_i$ of $\tX$}
+
+\State $\overline{\mX} \gets \overline{\mX}= \frac{1}{N_t}\sum_{i=1}^{N_t}\tX_{i}$ \Comment{Form signal template by averaging data across trials $\mX_i, \, \forall i$}
+\State $\overline{\mX}^{c} = \begin{bmatrix}
+    \overline{\mX}^\top & \overline{\mX}^\top & \dots & \overline{\mX}^\top
+    \end{bmatrix}$ \Comment{Form concat. template $\overline{\mX}^{c} \in \R^{N_c \times (N_s N_t)}$ to match dim. of $\mX^c$}
+\State generate $\mY$ \Comment{Form harmonic reference set $\mY \in \R^{2N_h \times N_s}$}
+
+\State $\mY^{c} \gets \mY^{c} = \begin{bmatrix}
+    \mY^\top & \mY^\top & \dots & \mY^\top
+    \end{bmatrix}$ \Comment{Form concat. reference $\mY^{c} \in \R^{2N_h \times (N_s N_t)}$ to match dim. of $\mX^c$}
+    
+\State $\widetilde{\vw} \gets \widetilde{\vw} = \begin{bmatrix}\vw_{\mX^{c}} & \vw_{\overline{\mX}^{c}} & \vw_{\mY^{c}} \end{bmatrix}^\top$ \Comment{Form augmented spatial filter vector}
+\State $\widetilde{\mX} = \widetilde{\mX} = \begin{bmatrix}(\mX^{c})^\top & (\overline{\mX}^{c})^\top & (\mY^{c})^\top \end{bmatrix}^\top$ \Comment{Form augmented signal matrix}
+\State $\mD \gets \mD = \textrm{diag}\bigg(\mX^{c}(\mX^{c}})^\top, \; \overline{\mX}^{c}(\overline{\mX}^{c})^\top, \; \mY^{c}(\mY^{c})^\top \bigg)$ \Comment{Form intermediate block-diagonal matrix $\mD$}
+\State $\widetilde{\vw}^*, \lambda^* \gets \widetilde{\mX}\widetilde{\mX}^\top\widetilde{\vw}=\lambda\mD \widetilde{\vw}$ \Comment{Find eigen pair with max eigenvalue $\lambda^*$ (Algorithm \ref{alg:gen-eig-algo})}
+\State store $\widetilde{\vw}^*, \; \overline{\mX}, \mY $ \Comment{Store optimised spatial filter (eigenvector) $\widetilde{\vw}^* \in \R^{2(N_c+N_h)}$}
+\EndFunction
+
+\vspace{0.3cm}
+\Function{ComputeGCCA}{$\mX_{\textrm{test}}$} \Comment{Test data $\mX \in \R^{N_c \times N_s}$}
+\State $\vw_{\mX^{c}}, \; \vw_{\overline{\mX}^{c}}, \; \vw_{\mY^{c}} \gets \widetilde{\vw}^*$ \Comment{Extract component filters from optimised $\widetilde{\vw}^*$}
+\State $\rho_1 \gets \rho_1 = \textrm{corr}(\mX_{\textrm{test}}\vw_{\mX^{c}}, \; \overline{\mX}\vw_{\overline{\mX}^{c}})$ \Comment{Canonical corr. between $\mX_{\textrm{test}}$ and historical template}
+\State $\rho_2 \gets \rho_2 = \textrm{corr}(\mX_{\textrm{test}}\vw_{\mX^{c}}, \; \mY\vw_{\mY^{c}})$ \Comment{Canonical corr. between $\mX_{\textrm{test}}$ and harmonic reference}
+\State $\rho \gets \rho = \textrm{sign}(\rho_1)\rho_1^2 + \textrm{sign}(\rho_2)\rho_2^2$ \Comment{Combined output correlation}
+\State return $\rho$
+\EndFunction
+\end{algorithmic}
+\caption{GCCA algorithm}
+\label{alg:gcca}
+\end{algorithm}
+The Python implementation of this algorithm is presented in Listing \ref{app-listing:gcca-algo} in Appendix \ref{app:firmware}.
+
 \subsubsection{MsetCCA}
+The implementation of the MsetCCA algorithm introduced in Section \ref{subsection:mset-cca-c2} is demonstrated in Algorithm \ref{alg:mset-cca}. As with the GCCA algorithm implementation in Section \ref{subsection:gcca-algo}, the \textsc{FitMCCA()} and \textsc{ComputeMCCA()} functions must be executed in sequence. That is, inference requires the optimised reference signal $\mY$ that is computed by \textsc{FitMCCA()}. Note that, for ease of explanation, the single-channel case $N_c=1$ (as used in this project) has been documented here. 
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Function{FitMCCA}{$\mX$} \Comment{Input training/calibration data matrix $\mX \in \R^{N_t \times N_s}$ }
+\State $\mR \gets \mR = \mX\mX^\top$ \Comment{Compute inter-trial covariance matrix}
+\State $\mS \gets \mS = \textrm{diag}(\mR)$ \Comment{Compute intra-trial covariance matrix}
+\State $\vw^*, \lambda^* \gets (\mR-\mS)\vw_{i}=\lambda_{i} \mS \vw_{i}, \quad \forall i \in\{1, \ldots, N_t\}$ \Comment{Find eig. pair with max eig. val $\lambda^*$ (Algorithm \ref{alg:gen-eig-algo})}
+\State $\mY^* \gets \mY = \begin{bmatrix}w^*_1 \vx_1 & w^*_2 \vx_2 & \dots & w^*_{N_t} \vx_{N_t} \end{bmatrix}$ \Comment{Compute opt. reference $\mY \in \R^{N_t\times N_s}$ with $\vx_i$ as rows of $\mX$.}
+\State store $\mY^*$
+\EndFunction
+\vspace{0.3cm}
+\Function{ComputeMCCA}{$\mX_{\textrm{test}}$} \Comment{Test data $\mX \in \R^{N_c \times N_s}, \, N_c=1$}
+\State $\rho \gets $ \textsc{ComputeCCA}($\mX_{\textrm{test}}, \, \mY^*$) \Comment{Compute canonical corr. using CCA with optimised ref. $\mY^*$}
+\State return $\rho$
+% \State return $\mY$
+\EndFunction
+\end{algorithmic}
+\caption{MsetCCA algorithm (single channel, $N_c=1$)}
+\label{alg:mset-cca}
+\end{algorithm}
+
+The MicroPython implementation of this algorithm is presented in Listing \ref{app-listing:mcca-algo} in Appendix \ref{app:firmware}.
 
 
 
