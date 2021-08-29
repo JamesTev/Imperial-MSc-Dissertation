@@ -188,7 +188,7 @@ A_pinv = np.dot(np.linalg.inv(np.dot(np.transpose(A), A)), np.transpose(A))
 # many other utility functions such as argmax(), argsort(), convolve()
 
 \end{minted}
-\caption{Illustration of the convenience offered by the \texttt{ulab} module for linear algebra and general numerical computing}
+\caption{Illustration of the convenience offered by the \texttt{ulab} module for linear algebra and general numerical computing.}
 \label{listing:ulab-intro}
 \end{listing}
 
@@ -205,10 +205,49 @@ Once processed and decoded, data from many BCI devices must be streamed to a cen
 As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a message broker (server) and several clients. In this case, the AWS IoT service acts as an MQTT broker that receives messages published by remote ESP32 BCI clients. Each of the clients have a unique client ID but subscribe to a common topic that the AWS service expects. Although the design of subsequent elements in the AWS cloud pipeline was not included in this project, a schematic representation is presented in Figure \ref{fig:networking-diagram-c5}: data received from BCI clients over MQTT is streamed to a web application that can be view in real time.
 
 \subsection{Logging}
-Discuss logging server and the potential for network logging ot anywhere
+% Discuss logging server and the potential for network logging ot anywhere
+Data logging from the ESP32-based BCI hardware was crucial for this project. This enabled the gathering of experimental data, but also various signals and messages for debugging during development. By leveraging the built-in WiFi functionality on the ESP32, a basic wireless logging system was created. 
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{web-logger-diagram}
+    \caption{Diagram showing the client-broker MQTT interface for relaying data captured by remote BCI devices to an AWS cloud service and thereafter, to a web application for visualisation. }
+    \label{fig:web-logger-c5}
+\end{figure}
+
+Figure \ref{fig:web-logger-c5} provides an overview of the web-based logging system. Potentially many ESP32 devices collect data and periodically log data to a web server. Typically, a REST API (application progamming interface) is deployed on the server which accepts requests from clients and processes and stores request data. In this project, a basic REST API\footnote{source code available \href{https://github.com/JamesTev/EEG-decoding/blob/master/eeg_lib/logging_server.py}{here}.} was created using \href{https://flask.palletsprojects.com/en/2.0.x/}{Flask}, the open source web micro-framework written in Python. 
+
+\begin{listing}[h]
+\small
+\begin{minted}{python}
+{
+    "client_id": "esp1", # used to identify which device data was received from
+    "timestamp": 1630235886, # used for synchronisation and periodicity monitoring
+    "trial_id": "test_123", # used to group trials 
+    "decoded_data": { # dict of stim. freqs and their decoded outputs
+        "7": 0.12,
+        "10": 0.56, 
+        "12": 0.04
+    },
+    "raw_data": [[ 0.02859, 0.054, ..., 0.345], # raw data for further offline analysis
+                [ 0.412, 0.001, ..., 0.345]]
+}
+
+\end{minted}
+\caption{Example JSON data payload sent from a remote ESP32 device via \texttt{POST} HTTP request to the logging server}
+\label{listing:logging-payload}
+\end{listing}
+The JSON object in Listing \ref{listing:logging-payload} shows an example of a data payload sent via an ESP32 client to the logging API. Decoded data, as well as raw data used to perform on-board decoding, is compiled into each data payload. Each payload is then sent via an HTTP \textt{POST} request to the logging server. Once received and verified by the API, data is written to a log file stored on the server. Note that in this project, the server and API were run on a local network and data was thus stored on a personal computer. However, the system would work identically if the server was deployed in the cloud. This would allow data to be logged by remote BCI devices from anywhere in the world and would not require users of the devices to run their own local server. This could facilitate a decentralised data acquisition system that could enable wide-scale data collection.  
 
 \subsection{Digital filtering}
-Discuss method of generating filter weights offline and then using SOS stored in flash
+The digital low-pass filter described in Section \ref{subsection:digital-filtering} whose frequency response is shown in Figure \ref{fig:digital-filt-resp} was designed using \href{https://docs.scipy.org/doc/scipy/index.html}{SciPy}, the popular open source scientific computing library for Python. In particular, given the filter design requirements, the \texttt{scipy.signal.ellip()} function was used to generate filter coefficients. Using the \texttt{output==`sos'} argument, the filter coefficients were computed in a cascaded second-order sections (SOS) representation. The SOS representation of an IIR filter with digital transfer function $H(z)$ is as follows:
+\begin{equation}
+H(z)=K\prod_{n=0}^{N-1} \frac{b_{n,\, 0}+b_{n,\, 1} z^{-1}+b_{n,\, 2} z^{-2}}{1+a_{n,\, 1} z^{-1}+a_{n,\, 2}_{z}^{-2}},
+\label{eq:sos-structure}
+\end{equation}
+where $K$ is a gain scalar, $N$ is the number of sections needed to realise the desired filter order and $a_n$ and $b_n$ are the reverse and forward coefficients for section $n$ respectively. Notice that in the form in (\ref{eq:sos-structure}), only a highest order of 2 is present for any component. This cascaded lower-order form offers greater numerical stability and less sensitivity to quantisation of coefficients than standard higher order polynomials.
+
+The filter coefficients, once computed offline, were stored as constants in the the ESP32 firmware (in particular, in the \texttt{lib.signal} module). As there was no need to recompute or otherwise modify these coefficients, they were stored in read-only flash memory to persist across power cycles and save space in RAM. In order to run digital filtering on the ESP32 itself, the convenient \texttt{scipy.signal.sosfilt()} from the \texttt{ulab} module was used. This function simply takes the pre-computed SOS coefficients and the input signal and returns the filtered version. Tests were performed to ensure equivalence between this implementation and the standard implementation in the fully-fledged SciPy module.  
 
 \section{Algorithm Implementation}
 \subsection{Eigenvalue algorithms}
