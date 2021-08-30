@@ -72,6 +72,30 @@ As mentioned in Chapter \ref{chapter:experimental-procedure}, the rudimentary he
 
 Figure \ref{fig:alpha-periodograms} shows the estimated power spectra recorded over several trials in each of the two aforementioned states. Particularly around 8Hz, Subfigure \ref{subfig:alpha-eyes-closed} representing the eyes closed state shows noticeably more signal power in the alpha band relative to the rest of the signal (compared to the eyes open state). This is suggestive of the presence of valid EEG signals as opposed to just random noise.
 
+\subsection{Execution time profiling}
+A number of trials were performed to determine the consistency of execution time across key system processes in the sample-decode-publish loop. Figure \ref{fig:timing-distributions} shows the distributions of execution times recorded over several trials. In each trial, all possible functionality was enabled so as to test maximum computational loading. "Auxiliarly processing time" is defined as the processing time in each loop required for any operations \textit{besides} decoding computation and publishing to AWS over MQTT. 
+
+\begin{figure}[htp]
+\centering
+\subfloat[decoding computation]{%
+  \includegraphics[clip,width=0.3\columnwidth]{report/C6 Results/assets/comp_tim_distr.pdf}%
+  \label{subfig:timing-comp}
+}
+\hfill
+\subfloat[MQTT publish]{%
+  \includegraphics[clip,width=0.36\columnwidth]{report/C6 Results/assets/pub_tim_distr.pdf}%
+  \label{subfig:timing-pub}
+}
+\hfill 
+\subfloat[auxiliary processing]{%
+  \includegraphics[clip,width=0.3\columnwidth]{report/C6 Results/assets/aux_proc_tim_distr.pdf}%
+  \label{subfig:timing-aux}
+}
+\caption[Execution time distributions for key processes in the sample-decode-publish loop.]{Execution time distributions for key processes in the sample-decode-publish loop. Auxiliary processing refers to any processing besides that which is required for decoding and publishing data over MQTT.}
+\label{fig:timing-distributions}
+\end{figure}
+
+
 \section{Experimental Decoding Results}
 In this section, the experimental results of various decoding algorithms introduced in Chapter \ref{chapter:lit-review} are reported. Unfortunately, because only single channel EEG signals were available using the hardware provided in this project, the TRCA algorithm was no longer appropriate. This is due to the fact that it tries to find optimal \textit{spatial} filters for task-related discrimination; effectively optimally-weighted combinations of multiple channels. Clearly, having only a single channel renders this approach ineffective. 
 
