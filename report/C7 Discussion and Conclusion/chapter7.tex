@@ -5,22 +5,41 @@
 \graphicspath{ {report/Chapter7/assets/} } 
 
 \section{Discussion}
-Lessons learnt
+% Lessons learnt
 
 \subsection{Digital signal processing system}
 The role of the DSP system in this project was paramount. Without appropriately processed signals, even the most sophisticated decoding algorithms would have been rendered useless. 
 
+The time domain plot in Figure \ref{fig:sq-wave-time-c6} demonstrates effective sampling; the input square wave is captured with consistent frequency and amplitude. As is more visible in Figure \ref{fig:sq-wave-spectra-c6}, the estimated spectrum of the low-pass-filtered signal is almost exactly as desired; pass-band distortion is negligible and extremely steep roll-off is achieved in the transition band. Furthermore, stop-band attenuation is more than sufficient and, encouragingly, is very close to the 80dB design specification. Finally, after establishing effective sampling and filtering, the PSD estimate of the downsampled signal in Figure \ref{fig:sq-wave-ds-spectra-c6} verifies that the theoretical downsampling rate of $f_s'=\frac{1}{4}f_s = 64$Hz is able to maintain signal fidelity in the pass-band. The implication of this is that 4x fewer samples can be used to represent the original signal with negligible loss of information. This is invaluable for a system such as the one in this project that is severely constrained in memory and computational power.
+
+In summary, the DSP system proved very effective and was verified to operate in very close agreement with its design parameters. Worth emphasising is the fact that all necessary DSP operations are able to be performed in firmware on the ESP32. Not only is this a prerequisite for the end-to-end on-device processing objective, but also, it makes for a more flexible and future-proof system. New filter weights or other DSP-related parameters can simply be flashed onto the device, or indeed, uploaded `over the air' through a network connection if needed.
 \subsection{Decoding}
 
-\subsubsection{Networking an communication}
+\subsubsection{Online decoding}
+One of the biggest challenges of this project was to develop a system capable of end-to-end, real-time on-device decoding. That is, an embedded system capable of performing all operations needed to acquire, process, decode and communicate signals without outsourcing any computation off the device. 
+
+As documented in the system design in Chapter \ref{chapter:system-design} and demonstrated by the results in Chapter \ref{chapter:results}, one can conclude that this objective has been achieved. This is extremely significant as it means that a fully functional (albeit fairly basic) BCI device can be deployed in a small, self-contained package that is both completely mobile and extremely cost-effective. From a technical perspective, the fact that sophisticated decoding algorithms leveraging eigenvalue solvers and other high level linear algebra can be performed on a microcontroller - and with such ease of implementation - is quite remarkable.  
+
+\subsubsection{Generalisation ability}
+One of the most significant limitations of this system is the need for calibration during prior to each new recording session. A session, in this context, is defined as a distinct, continuous period in which the BCI headset was not removed or adjusted. Correspondingly, in order to separate sessions and truly test generalisation ability, it was required that the headset be removed between sessions. The results of the generalisation tests in Section \ref{subsection:generalisation-testing} show that using calibration data from one session was not helpful when used in preparation for inference in a different session. Referring to the convention explained in Section \ref{subsection:generalisation-testing}, Figure \ref{fig:gt-results-gcca} and Figure \ref{fig:gt-results-mcca} show very poor decoding performance for the case of no overlapping trials. This suggests that calibration and test data from two completely distinct sessions is not feasible. Interestingly, with $n>0$ overlapping trials, decoding accuracy was \textit{worse} than in the original decoding tests in Section \ref{subsection:decoding-acc-ns-effect} where calibration and test data sets were drawn from the same session (ultimately leaving less data available for calibration). In the case of overlapping trials, calibration was performed on both the whole first session \textit{and} a subset of the second session on which testing was performed. It is thus surprising that this overlapping case yielded poorer performance as the decoding algorithms had access to a superset of the calibration data available in the initial tests in Section \ref{subsection:decoding-acc-ns-effect}. 
+
+These findings suggest that there is dramatic variance in recorded signals across sessions. This may be due to several factors:
+\begin{enumerate}
+    \item There was \textbf{no standardised positioning} of the BCI headband on the subject's head across sessions. Each time the headband was put on, an attempt was made to estimate consistent positioning but as the electrodes were positioned at the back of the head, this was difficult to do reliably without assistance (which was seldom available). Consequent deviations in the electrode positions across sessions would naturally produce noticeable variance in measured signals.
+    \item Only dry electrodes could be used and \textbf{scalp-contact quality was inconsistent} at best. On some occasions, it was found that electrodes would be lodged in a more favourable orientation with better scalp contact than on others. This was caused by variations in hair partings and angle-of-location relative to the protruding inion at the back of the skull. 
+    \item Albeit a differential measurement across two electrodes, only a \textbf{single EEG channel} was available. This poses more of a challenge for decoding algorithms to reject task-unrelated artefacts and random noise owing to having no other independent measurements available.  
+\end{enumerate}
+
+\subsection{Networking and communication}
 Mention somewhere that the networking aspect with MQTT can stream data up to 5Hz but was only required to do so at around 1Hz (2s sampling window with 50\% overlap)
 
 \subsection{Limitations of the system and experimental procedures}
 
+
+
 \subsection{Challenges encountered}
 Discuss numerical challenges, precision issues, memory constraints
 Discuss some of the auxiliary computational approaches used such as eigenvalue solvers etc
-
 
 
 \subsection{Impact of constraints}
@@ -56,7 +75,7 @@ While the algorithms selected in this project are some of the most popular and a
 \subsubsection{Broader testing set}
 As alluded to, the COVID-19 Pandemic made it difficult to gather data from different subjects during the course of this project. As a result, data was only collected on the author. This 
 
-\subsubsection{Bluetooth communication}
+- mention how calibration averaging over many more people may make generalisation feasible
 
 
 

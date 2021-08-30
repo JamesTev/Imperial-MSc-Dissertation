@@ -51,7 +51,7 @@ Along with $\hat{P}_x(\omega)$ as before, Figure \ref{fig:sq-wave-ds-spectra-c6}
     \caption[PSD estimates of an input signal, filtered and downsampled version and a downsampled version without filtering.]{Standard periodogram (left) and Welch-averaged periodogram (right) representing PSD estimates $\hat{P}_x(\omega)$ and $\hat{P}_z(\omega)$ of input $x[n]$ and filtered, downsampled output $z[n]$ respectively. $\hat{P}_{\text{alias}}(\omega)$ shows the estimated spectrum of a downsampled version of $x[n]$ \textit{without} prior low-pass filtering}.
     \label{fig:sq-wave-ds-spectra-c6}
 \end{figure}
-On the other hand, Figure \ref{fig:sq-wave-ds-spectra-c6} also demonstrates the effectiveness of the DSP system as a whole: with suitable low-pass filtering, the spectrum of the downsampled signal $z[n]$ in the pass-band between 0 and 24Hz agrees very closely with that of the original signal $x[n]$. The implication of this is that 4x fewer samples can be used to represent $x[n]$ with negligible loss of information. This is invaluable for a system such as the one in this project that is severely constrained in memory and computational power.
+On the other hand, Figure \ref{fig:sq-wave-ds-spectra-c6} also demonstrates the effectiveness of the DSP system as a whole: with suitable low-pass filtering, the spectrum of the downsampled signal $z[n]$ in the pass-band between 0 and 24Hz agrees very closely with that of the original signal $x[n]$. 
 
 \subsection{Hardware and data acquisition}
 
@@ -91,6 +91,7 @@ LpO CV was selected, as opposed to leave-one-out CV\footnote{a special case of L
 \end{figure}
 
 \subsection{The effect of recording window length}
+\label{subsection:decoding-acc-ns-effect}
 As alluded to in Section \ref{subsection:time-frequency-considerations-c2}, arguably the most important factor in the decoding system - besides the actual algorithm used - is the length of the recording window $T$. As cited in the literature review, decoding accuracy almost always improved with increasing $T$. This is expected; longer time windows offer more samples to the decoding algorithm being used. However, the trade off is decreased information transfer rate (ITR) which results in a more sluggish BCI system. 
 
 Figures \ref{fig:gcca-acc-nt} and \ref{fig:mset-acc-nt} show the effect of varying $T$ on decoding accuracy for the GCCA and MsetCCA algorithms respectively. For each algorithm, the effect of varying $T$ is tested with four different calibration scenarios with $p=1,\dots,4$ where $p$ is the number of training or calibration trials. As expected, there is a monotonic increase in \textit{average} decoding accuracy (across stimulus frequencies for each trial) with increasing $T$. Clearly, there is also an interaction with the number of calibration trials $p$.
@@ -207,6 +208,7 @@ Figures \ref{fig:gcca-acc-nt} and \ref{fig:mset-acc-nt} show the effect of varyi
 \end{figure}
 
 \subsection{Generalisation testing}
+\label{subsection:generalisation-testing}
 Of interest to template-based decoding algorithms that leverage historical `training' or calibration data is their ability to \textit{generalise} to new sets of data. In order to clarify this idea in context, consider two trial sessions $X_a$ and $X_b$ taken under \textit{different conditions} where the subject would have at least had to remove and reinstall the BCI headband on their head between sets. Thus, $X_a$ and $X_b$ would be recorded with slightly different electrode positions and contact impedances and would therefore exhibit different signal quality. 
 
 This experiment was thus designed to investigate whether calibration using data from one session, $X_a$ say, would allow generalise to another, say $X_b$. That is, would calibrating using $X_a$ and testing (validating) on $X_b$ yield comparable performance to calibrating and testing on data recorded from the same session as before? If so, the implication is that calibration would only need to be performed once-off, or at least, not \textit{every} recording session which would enhance the user experience. An extension of this experiment was to determine if calibrating using $X_a$ \textit{and} a small subset of $X_b$ and then testing on the remainder of $X_b$ would yield better performance than only calibrating on the subset of $X_b$ as in previous experiments.
