@@ -7,23 +7,56 @@
 \section{Discussion}
 Lessons learnt
 
+\subsection{Digital signal processing system}
+The role of the DSP system in this project was paramount. Without appropriately processed signals, even the most sophisticated decoding algorithms would have been rendered useless. 
+
+\subsection{Decoding}
+
+\subsubsection{Networking an communication}
+Mention somewhere that the networking aspect with MQTT can stream data up to 5Hz but was only required to do so at around 1Hz (2s sampling window with 50\% overlap)
+
+\subsection{Limitations of the system and experimental procedures}
+
 \subsection{Challenges encountered}
 Discuss numerical challenges, precision issues, memory constraints
 Discuss some of the auxiliary computational approaches used such as eigenvalue solvers etc
 
-Mention how most other reports like MsetCCA and GCCA compare effect of following on acc:
-- number of harmonics 
-- number of channels
-obv not possible in this project.
 
-Mention how open source tools been used exclusively and all components of this proj were developed in Jupyter notebooks - incl. filtering, DAQ, preprocessing, decoding, networking etc. This could be a great platform for young people to learn more. Mention also how micropython lends itself to this; you can use the interactive notebook with the ESP32 over serial which is much more intuitive and user friendly than having to re-flash and test.
 
-Mention somewhere that the networking aspect with MQTT can stream data up to 5Hz but was only required to do so at around 1Hz (2s sampling window with 50\% overlap)
+\subsection{Impact of constraints}
+Besides the extremely limited budget, the constraint of having only a single channel likely proved to be the most significant in this project. The literature cited in Section \ref{section:existing-bci-tech-c2} suggests that very few, if any, BCI devices rely on a single measurement channel alone. Systems with two to four electrodes are far more common; the studies reviewed in Section \ref{subsection:nature-of-eeg-signals} showed that, up until some saturation point, increasing the number of active channels invariably improves decoding accuracy. 
 
+Not only would the presence of multiple channels very likely improve decoding performance in the existing decoding algorithms used, but it would also enable other multi-channel algorithms to be used. TRCA, as presented in Section \ref{sec:trca-c3}, is one such algorithm that requires multiple channels. This algorithm (and its extensions) has been shown to be very effective and would prove a worthy contender to the existing CCA-based algorithms used in this project. 
+
+\subsection{Choice of decoding algorithms}
+
+\subsection{Choice of development tools}
+The tools used to develop this project, including the software, firmware and other technologies, were not only important during the development phase, but will continue to be after completion of this dissertation. The reason for this is that, as specified in the initial project scope and constraints mentioned in Chapter \ref{chapter:introduction}, a core objective for this project was to create a platform that can one day be used as an engagement and/or educational tool in the neurotechnology community. This factor strongly guided the choice of technologies in this project and ultimately, a system has been designed that uses exclusively open source tools. 
+
+The choice of MicroPython for development with the ESP32 proved to be extremely prudent. MicroPython offers extremely simple yet elegant syntax and useful constructs that not only speed up development, but also make the process far more enjoyable. From an educational perspective, MicroPython is far more intuitive than C/C++ or their derivatives and shares the same syntax as Python; an extremely popular language for programming education. This also allowed for the use of the \texttt{ulab} module for linear algebra and other scientific computing that was absolutely indispensable to this project.
+
+Finally, ease of development using the MicroPython ecosystem is undoubtedly the easiest and most convenient of all other options. In particular, a Jupyter Notebook can be used over a serial connection to a MicroPython-compatible board to offer immediate and interactive development, experimentation and debugging. Compared to more traditional embedded ecosystems that require any code updates to be flashed onto the target MCU and rerun, this interactive environment is remarkably efficient. All components of this system - including those responsible for data acquisition, filtering, computation and communication - were developed in an interactive notebook environment before being compiled into frozen bytecode on the device.
 
 
 \section{Conclusion and Future Work}
-Evaluate if objectives initially laid out were achieved
-- if not, why not
-- if they had been stated differently/more realistically, would the outcome have been different?
-- what would need to be done differently next time
+
+\subsubsection{Future work}
+While the system developed in this project performed remarkably well considering the constraints imposed on it, there are several areas for improvement. The following observations and suggestions are made for future extensions of this project. 
+% Evaluate if objectives initially laid out were achieved
+% - if not, why not
+% - if they had been stated differently/more realistically, would the outcome have been different?
+% - what would need to be done differently next time
+
+\subsubsection{Multi-channel sensing}
+As mentioned in the prior discussion, it is firmly believed that introducing additional EEG channels will significantly improve decoding performance. Furthermore, it is conceivable that the existing electronic hardware in this project could be adapted for multi-channel support by using a multi-channel analogue frontend (as is used on the OpenBCI Ganglion board, for example). The ESP32 SoC also has several available ADC inputs.
+
+\subsubsection{Algorithm expansion}
+While the algorithms selected in this project are some of the most popular and are close to the state-of-the-art at the time of writing, there are many other slight adjustments and extensions to these algorithms that warrant exploration. 
+
+\subsubsection{Broader testing set}
+As alluded to, the COVID-19 Pandemic made it difficult to gather data from different subjects during the course of this project. As a result, data was only collected on the author. This 
+
+\subsubsection{Bluetooth communication}
+
+
+
