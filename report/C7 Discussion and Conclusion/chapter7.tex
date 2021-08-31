@@ -14,6 +14,7 @@ The time domain plot in Figure \ref{fig:sq-wave-time-c6} demonstrates effective 
 
 In summary, the DSP system proved very effective and was verified to operate in very close agreement with its design parameters. Worth emphasising is the fact that all necessary DSP operations are able to be performed in firmware on the ESP32. Not only is this a prerequisite for the end-to-end on-device processing objective, but also, it makes for a more flexible and future-proof system. New filter weights or other DSP-related parameters can simply be flashed onto the device, or indeed, uploaded `over the air' through a network connection if needed.
 \subsection{Decoding}
+TODO
 
 \subsubsection{Online decoding}
 One of the biggest challenges of this project was to develop a system capable of end-to-end, real-time on-device decoding. That is, an embedded system capable of performing all operations needed to acquire, process, decode and communicate signals without outsourcing any computation off the device. 
@@ -31,10 +32,20 @@ These findings suggest that there is dramatic variance in recorded signals acros
 \end{enumerate}
 
 \subsection{Networking and communication}
-Mention somewhere that the networking aspect with MQTT can stream data up to 5Hz but was only required to do so at around 1Hz (2s sampling window with 50\% overlap)
+The MQTT interface for publishing data to the AWS IoT Core service proved very effective. Although it was not formally tested, there were no recorded instances of packet loss. A limitation of having to use this protocol over public Internet is the slightly inconsistent latency experienced in publishing data. The distribution of time required to successfully publish decoded data to AWS (`publish time') in Figure \ref{subfig:timing-pub} demonstrates this phenomenon. The mean publish time is around 100ms with a standard deviation of 210ms which leaves most times below the 350ms mark. However, it was noticed that sporadically, times of over 2s would occur. This is likely due to fluctuations in network traffic - both on the Internet, the AWS service and most likely, within the personal network of the user. This is not a significant issue, however, as all data payloads are sent with timestamps; any readings received after a predetermined tolerance window could simply be discarded before resynchronising the system. 
 
 \subsection{Limitations of the system and experimental procedures}
+A summary of the limitations of the system alluded to above are as follows:
+\begin{itemize}
+    \item single channel measurement
+    \item variable latency in the upstream link to AWS IoT core for publishing data
+    \item 
+\end{itemize}
 
+Limitations in the experimental procedure followed include:
+\begin{itemize}
+    \item only being able to gather data from a single test subject
+\end{itemize}
 
 
 \subsection{Challenges encountered}
@@ -48,6 +59,7 @@ Besides the extremely limited budget, the constraint of having only a single cha
 Not only would the presence of multiple channels very likely improve decoding performance in the existing decoding algorithms used, but it would also enable other multi-channel algorithms to be used. TRCA, as presented in Section \ref{sec:trca-c3}, is one such algorithm that requires multiple channels. This algorithm (and its extensions) has been shown to be very effective and would prove a worthy contender to the existing CCA-based algorithms used in this project. 
 
 \subsection{Choice of decoding algorithms}
+TODO
 
 \subsection{Choice of development tools}
 The tools used to develop this project, including the software, firmware and other technologies, were not only important during the development phase, but will continue to be after completion of this dissertation. The reason for this is that, as specified in the initial project scope and constraints mentioned in Chapter \ref{chapter:introduction}, a core objective for this project was to create a platform that can one day be used as an engagement and/or educational tool in the neurotechnology community. This factor strongly guided the choice of technologies in this project and ultimately, a system has been designed that uses exclusively open source tools. 
@@ -74,8 +86,10 @@ While the algorithms selected in this project are some of the most popular and a
 
 \subsubsection{Broader testing set}
 As alluded to, the COVID-19 Pandemic made it difficult to gather data from different subjects during the course of this project. As a result, data was only collected on the author. This 
-
 - mention how calibration averaging over many more people may make generalisation feasible
 
 
+% \subsubsection{More robust testing}
+% Mention idea of switching squares around to test robustness
 
+\subsubsection{Improving comfort of electrodes}
