@@ -324,15 +324,15 @@ $\mathbf{\bar{x}}$ &
   52.22 &
   65.56 &
   72.22 &
-  74.44 &
+  \multicolumn{1}{l|}{74.44} &
   63.33 &
   71.67 &
   83.89 &
-  90.56 &
+  \multicolumn{1}{l|}{90.56} &
   71.11 &
   82.78 &
   91.11 &
-  94.44 &
+  \multicolumn{1}{l|}{94.44} &
   77.78 &
   83.33 &
   95.56 &
@@ -341,15 +341,15 @@ $\mathbf{s_{\bar{x}}}$ &
   8.341 &
   7.800 &
   6.204 &
-  7.120 &
+  \multicolumn{1}{l|}{7.120} &
   6.037 &
   5.292 &
   3.590 &
-  2.823 &
+  \multicolumn{1}{l|}{2.823} &
   5.095 &
   4.556 &
   3.167 &
-  1.824 &
+  \multicolumn{1}{l|}{1.824} &
   7.098 &
   6.558 &
   2.893 &
@@ -358,49 +358,48 @@ $\boldsymbol{\sigma_f}^2$ &
   0.084 &
   0.084 &
   0.107 &
-  0.201 &
+  \multicolumn{1}{l|}{0.201} &
   \textbf{0.029} &
   0.067 &
   0.136 &
-  0.107 &
+  \multicolumn{1}{l|}{0.107} &
   0.107 &
   0.035 &
   0.075 &
-  0.082 &
+  \multicolumn{1}{l|}{0.082} &
   0.126 &
   0.088 &
   0.051 &
   0.039 \\
- \textbf{ITR} &
+ITR &
   8.69 &
   18.70 &
   13.64 &
-  7.64 &
+  \multicolumn{1}{l|}{7.64} &
   21.61 &
   26.51 &
   23.61 &
-  15.59 &
+  \multicolumn{1}{l|}{15.59} &
   34.30 &
   45.00 &
   31.90 &
-  18.29 &
+  \multicolumn{1}{l|}{18.29} &
   \textbf{47.89} &
   46.09 &
   38.35 &
   21.14 \\ \bottomrule
 \end{tabular}%
 }
-\caption[GCCA results summary: a compilation of decoding performance metrics for the GCCA algorithm.]{\textbf{GCCA results summary}: a compilation of decoding performance metrics for the GCCA algorithm. Results are reported over varying numbers of calibration trials $p$ and recording window lengths $T$ (in seconds). Average accuracy across frequency $\mathbf{\bar{x}}$ its standard error $\mathbf{s_{\bar{x}}}$ are reported in $\%$. \textbf{ITR} is given in bits/min. Frequency variance $\boldsymbol{\sigma_f}^2$ is dimensionless.}
+\caption[GCCA results summary: a compilation of decoding performance metrics for the GCCA algorithm.]{\textbf{GCCA results summary}: a compilation of decoding performance metrics for the GCCA algorithm. Results are reported over varying numbers of calibration trials $p$ and recording window lengths $T$ (in seconds). Average accuracy across frequency $\mathbf{\bar{x}}$ its standard error $\mathbf{s_{\bar{x}}}$ are reported in $\%$. \textbf{ITR} is given in bits/min. Accuracy variance over frequency $\boldsymbol{\sigma_f}^2$ is dimensionless.}
 \label{tab:gcca-results}
 \end{table}
 
 \begin{table}[]
 \centering
-\small
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllllllllllllll@{}}
 \toprule
-$p$          & \multicolumn{4}{c}{\textbf{1}} & \multicolumn{4}{c}{\textbf{2}} & \multicolumn{4}{c}{\textbf{3}} & \multicolumn{4}{c}{\textbf{4}} \\ \midrule
+\textbf{$p$} & \multicolumn{4}{c}{\textbf{1}} & \multicolumn{4}{c}{\textbf{2}} & \multicolumn{4}{c}{\textbf{3}} & \multicolumn{4}{c}{\textbf{4}} \\ \midrule
 $T$ &
   \textbf{0.75} &
   \textbf{1} &
@@ -418,13 +417,77 @@ $T$ &
   \textbf{1} &
   \textbf{2} &
   \textbf{4} \\ \cmidrule(l){2-17} 
-$\mathbf{\bar{x}}$ & 60.00  & 64.44 & 74.44 & 78.89 & 76.67  & 80.56 & 87.22 & 88.89 & 88.89  & 90.56 & 95.56 & 96.11 & 95.56  & 95.56 & 98.89 & \textbf{98.89} \\
-$\mathbf{s_{\bar{x}}}$  & 7.070  & 8.341 & 7.522 & 7.659 & 4.633  & 4.462 & 3.496 & 3.126 & 3.716  & 3.438 & 2.039 & 2.215 & 3.736  & 3.736 & \textbf{0.512} & 1.111 \\
-$\boldsymbol{\sigma_f}^2$ & 0.067  & 0.069 & 0.150 & 0.102 & 0.073  & 0.079 & 0.069 & 0.051 & 0.048  & 0.063 & 0.039 & 0.039 & 0.019  & 0.019 & 0.019 & \textbf{0.019} \\
-\textbf{ITR} & 17.12  & 17.42 & 15.28 & 9.45  & 45.44  & 40.80 & 27.17 & 14.56 & 77.65  & 62.37 & 38.35 & 19.63 & \textbf{102.28} & 76.71 & 44.58 & 22.29 \\ \bottomrule
+$\mathbf{\bar{x}}$ &
+  60.00 &
+  64.44 &
+  74.44 &
+  \multicolumn{1}{l|}{78.89} &
+  76.67 &
+  80.56 &
+  87.22 &
+  \multicolumn{1}{l|}{88.89} &
+  88.89 &
+  90.56 &
+  95.56 &
+  \multicolumn{1}{l|}{96.11} &
+  95.56 &
+  95.56 &
+  98.89 &
+  \textbf{98.89} \\
+$\mathbf{s_{\bar{x}}}$ &
+  7.070 &
+  8.341 &
+  7.522 &
+  \multicolumn{1}{l|}{7.659} &
+  4.633 &
+  4.462 &
+  3.496 &
+  \multicolumn{1}{l|}{3.126} &
+  3.716 &
+  3.438 &
+  2.039 &
+  \multicolumn{1}{l|}{2.215} &
+  3.736 &
+  3.736 &
+  \textbf{0.512} &
+  1.111 \\
+$\boldsymbol{\sigma_f}^2$ &
+  0.067 &
+  0.069 &
+  0.150 &
+  \multicolumn{1}{l|}{0.102} &
+  0.073 &
+  0.079 &
+  0.069 &
+  \multicolumn{1}{l|}{0.051} &
+  0.048 &
+  0.063 &
+  0.039 &
+  \multicolumn{1}{l|}{0.039} &
+  0.019 &
+  0.019 &
+  0.019 &
+  \textbf{0.019} \\
+\textbf{ITR} &
+  17.12 &
+  17.42 &
+  15.28 &
+  \multicolumn{1}{l|}{9.45} &
+  45.44 &
+  40.80 &
+  27.17 &
+  \multicolumn{1}{l|}{14.56} &
+  77.65 &
+  62.37 &
+  38.35 &
+  \multicolumn{1}{l|}{19.63} &
+  \textbf{102.28} &
+  76.71 &
+  44.58 &
+  22.29 \\ \bottomrule
 \end{tabular}%
 }
-\caption[MsetCCA results summary: a compilation of decoding performance metrics for the MsetCCA algorithm.]{\textbf{MsetCCA results summary}: a compilation of decoding performance metrics for the MsetCCA algorithm. Results are reported over varying numbers of calibration trials $p$ and recording window lengths $T$ (in seconds). Average accuracy across frequency $\mathbf{\bar{x}}$ its standard error $\mathbf{s_{\bar{x}}}$ are reported in $\%$. \textbf{ITR} is given in bits/min. Frequency variance $\boldsymbol{\sigma_f}^2$ is dimensionless.}
+\caption[MsetCCA results summary: a compilation of decoding performance metrics for the MsetCCA algorithm.]{\textbf{MsetCCA results summary}: a compilation of decoding performance metrics for the MsetCCA algorithm. Results are reported over varying numbers of calibration trials $p$ and recording window lengths $T$ (in seconds). Average accuracy across frequency $\mathbf{\bar{x}}$ its standard error $\mathbf{s_{\bar{x}}}$ are reported in $\%$. \textbf{ITR} is given in bits/min. Accuracy variance over frequency $\boldsymbol{\sigma_f}^2$ is dimensionless.}
 \label{tab:mcca-results}
 \end{table}
 

@@ -24,14 +24,15 @@ What is evident from both experiments with varying $T$ and $p$ is that the relia
 
 \subsubsection{Comparison of accuracy across algorithms}
 \label{subsection:algo-comparison-results}
-While trends in decoding accuracy between the GCCA and MsetCCA algorithms are similar, there are some notable differences. 
+While trends in decoding accuracy between the GCCA and MsetCCA algorithms are similar, there are some notable differences. With reference to the summarised performance metrics in Table \ref{tab:mcca-results} and Table \ref{tab:mcca-results}, MsetCCA shows superior quantitative performance characteristics over all metrics considered. Furthermore, the plots in Figure \ref{fig:freq-var-plots} show a far more consistent decline in accuracy variance across frequencies with increasing $p$ for MsetCCA compared to GCCA, as well as lower absolute variances. Finally, in the results of the generalisation tests in Section \ref{subsection:generalisation-testing}, the MsetCCA results once again show a more consistent trend with substantially less variance than the GCCA counterparts. This behaviour suggests that, with more historical calibration data from across different conditions and test subjects, MsetCCA is more likely to generalise to true out-of-sample data.
 
-\subsubsection{Online decoding}
+\subsection{Online decoding}
 One of the biggest challenges of this project was to develop a system capable of end-to-end, real-time on-device decoding. That is, an embedded system capable of performing all operations needed to acquire, process, decode and communicate signals without outsourcing any computation off the device. 
 
 As documented in the system design in Chapter \ref{chapter:system-design} and demonstrated by the results in Chapter \ref{chapter:results}, one can conclude that this objective has been achieved. This is extremely significant as it means that a fully functional (albeit fairly basic) BCI device can be deployed in a small, self-contained package that is both completely mobile and extremely cost-effective. From a technical perspective, the fact that sophisticated decoding algorithms leveraging eigenvalue solvers and other high level linear algebra can be performed on a microcontroller - and with such ease of implementation - is quite remarkable.  
 
-\subsubsection{Generalisation ability}
+\subsection{Generalisation ability}
+\label{subsection:generaliation-discussion}
 One of the most significant limitations of this system is the need for calibration during prior to each new recording session. A session, in this context, is defined as a distinct, continuous period in which the BCI headset was not removed or adjusted. Correspondingly, in order to separate sessions and truly test generalisation ability, it was required that the headset be removed between sessions. The results of the generalisation tests in Section \ref{subsection:generalisation-testing} show that using calibration data from one session was not helpful when used in preparation for inference in a different session. Referring to the convention explained in Section \ref{subsection:generalisation-testing}, Figure \ref{fig:gt-results-gcca} and Figure \ref{fig:gt-results-mcca} show very poor decoding performance for the case of no overlapping trials. This suggests that calibration and test data from two completely distinct sessions is not feasible. Interestingly, with $n>0$ overlapping trials, decoding accuracy was \textit{worse} than in the original decoding tests in Section \ref{subsection:decoding-acc-ns-effect} where calibration and test data sets were drawn from the same session (ultimately leaving less data available for calibration). In the case of overlapping trials, calibration was performed on both the whole first session \textit{and} a subset of the second session on which testing was performed. It is thus surprising that this overlapping case yielded poorer performance as the decoding algorithms had access to a superset of the calibration data available in the initial tests in Section \ref{subsection:decoding-acc-ns-effect}. 
 
 These findings suggest that there is dramatic variance in recorded signals across sessions. This may be due to several factors:
@@ -41,35 +42,27 @@ These findings suggest that there is dramatic variance in recorded signals acros
     \item Albeit a differential measurement across two electrodes, only a \textbf{single EEG channel} was available. This poses more of a challenge for decoding algorithms to reject task-unrelated artefacts and random noise owing to having no other independent measurements available.  
 \end{enumerate}
 
-\subsection{Networking and communication}
-The MQTT interface for publishing data to the AWS IoT Core service proved very effective. Although it was not formally tested, there were no recorded instances of packet loss. A limitation of having to use this protocol over public Internet is the slightly inconsistent latency experienced in publishing data. The distribution of time required to successfully publish decoded data to AWS (`publish time') in Figure \ref{subfig:timing-pub} demonstrates this phenomenon. The mean publish time is around 100ms with a standard deviation of 210ms which leaves most times below the 350ms mark. However, it was noticed that sporadically, times of over 2s would occur. This is likely due to fluctuations in network traffic - both on the Internet, the AWS service and most likely, within the personal network of the user. This is not a significant issue, however, as all data payloads are sent with timestamps; any readings received after a predetermined tolerance window could simply be discarded before resynchronising the system. 
+\section{Networking and communication}
+The MQTT protocol for publishing data to the AWS IoT Core service proved very effective. Although it was not formally tested, there were no recorded instances of packet loss. Furthermore, it is a widely-adopted protocol in the Internet of Things (IoT) community and as a result, there are many open source MQTT utilities, guides and sources of documentation. This was convenient during the development of this project and will hopefully continue to be in future revisions if used for educational purposes.
 
-\subsection{Limitations of the system and experimental procedures}
-A summary of the limitations of the system alluded to above are as follows:
-\begin{itemize}
-    \item single channel measurement
-    \item variable latency in the upstream link to AWS IoT core for publishing data
-    \item 
-\end{itemize}
+A limitation of having to use this protocol over public Internet is the slightly inconsistent latency experienced in publishing data. The distribution of time required to successfully publish decoded data to AWS (`publish time') in Figure \ref{subfig:timing-pub} demonstrates this phenomenon. The mean publish time is around 100ms with a standard deviation of 210ms which leaves most times below the 350ms mark. However, it was noticed that sporadically, times of over 2s would occur. This is likely due to fluctuations in network traffic - both on the Internet, the AWS service and most likely, within the personal network of the user. This is not a significant issue, however, as all data payloads are sent with timestamps; any readings received after a predetermined tolerance window could simply be discarded before resynchronising the system.
 
-Limitations in the experimental procedure followed include:
-\begin{itemize}
-    \item only being able to gather data from a single test subject
-\end{itemize}
-
+\section{System Design and Methodologies}
 
 \subsection{Challenges encountered}
-Discuss numerical challenges, precision issues, memory constraints
-Discuss some of the auxiliary computational approaches used such as eigenvalue solvers etc
+Several trials and tribulations were encountered in this project - most of which were related to numerical/computation challenges or memory limitations. One of the first of these was a limitation in the eigenvalue solver in the \texttt{ulab} module which only allowed for computation on symmetric matrices. Through engagement with the author of \texttt{ulab} project, Mr Zoltán Vörös, a way to circumvent this problem was developed. After reading about the QR-iteration algorithm for solving for eigenvalues iteratively, a request for a QR decomposition function was put forth to Mr Vörös. Fortunately, he kindly obliged and soon added the required functionality which can now be found in the latest version of this module. This is one of the beauties of open source software.
 
+Another challenge was encountered upon noticing that, even with identical inputs, certain linear algebra operations on the ESP32 were not producing the same results as their equivalents on a 64-bit computer. After some debugging, this was discovered to be down to precision issues in the MicroPython firmware image running on the ESP32. Fortunately, only one compiler flag had to be adjusted to enable double precision before rebuilding and flashing the updated MicroPython firmware. This solved the earlier numerical equivalence issues. 
 
-\subsection{Impact of constraints}
+\subsection{Limitations of the system}
+\label{subsection:syst-limitations-discuss}
 Besides the extremely limited budget, the constraint of having only a single channel likely proved to be the most significant in this project. The literature cited in Section \ref{section:existing-bci-tech-c2} suggests that very few, if any, BCI devices rely on a single measurement channel alone. Systems with two to four electrodes are far more common; the studies reviewed in Section \ref{subsection:nature-of-eeg-signals} showed that, up until some saturation point, increasing the number of active channels invariably improves decoding accuracy. 
 
-Not only would the presence of multiple channels very likely improve decoding performance in the existing decoding algorithms used, but it would also enable other multi-channel algorithms to be used. TRCA, as presented in Section \ref{sec:trca-c3}, is one such algorithm that requires multiple channels. This algorithm (and its extensions) has been shown to be very effective and would prove a worthy contender to the existing CCA-based algorithms used in this project. 
+Not only would the presence of multiple channels very likely improve decoding performance in the existing decoding algorithms used, but it would also enable other multi-channel algorithms to be used. TRCA, as presented in Section \ref{sec:trca-c3}, is one such algorithm that requires multiple channels. This algorithm (and its extensions) has been shown to be very effective and would prove a worthy contender to the existing CCA-based algorithms used in this project.
 
-\subsection{Choice of decoding algorithms}
-TODO
+While less of a concern in a development scenario, the ergonomics of the BCI device will become an important consideration when used in a more public setting. The current hardware prototype, as pictured in Figure \ref{fig:final-headband-subfigs}, becomes remarkably uncomfortable after even a modest amount of time. This is likely due to the fact that the electrodes protrude substantially from the headband strap. 
+
+As discussed in Section \ref{subsection:generaliation-discussion}, the current BCI system requires at least a few initial calibration trials to work effectively. However, this is not a very severe limitation since calibration can be performed in just 10 to 15 seconds if only two calibration trials of $T=2$s are employed, for example. This calibration period can also be reduced if slightly decreased performance can be tolerated. The more significant limitation, however, is that calibration must be performed at the beginning of each new session. That is, each time the BCI headband is removed and reinstalled (or moved around significantly without being completely removed). 
 
 \subsection{Choice of development tools}
 The tools used to develop this project, including the software, firmware and other technologies, were not only important during the development phase, but will continue to be after completion of this dissertation. The reason for this is that, as specified in the initial project scope and constraints mentioned in Chapter \ref{chapter:introduction}, a core objective for this project was to create a platform that can one day be used as an engagement and/or educational tool in the neurotechnology community. This factor strongly guided the choice of technologies in this project and ultimately, a system has been designed that uses exclusively open source tools. 
