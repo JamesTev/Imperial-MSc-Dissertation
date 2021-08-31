@@ -1,20 +1,17 @@
-%% Chapter 7: Discussion and Conclusion
-\chapter{Discussion and Conclusion}
-\label{chapter:discussion-conclusion}
+%% Chapter 7: Discussion 
+\chapter{Discussion of Results and Methodologies}
+\label{chapter:discussion}
 
-\graphicspath{ {report/Chapter7/assets/} } 
+\graphicspath{ {report/C7 Discussion/assets/} } 
 
-\section{Discussion}
-% Lessons learnt
-
-\subsection{Digital signal processing system}
+\section{Digital signal processing system}
 The role of the DSP system in this project was paramount. Without appropriately processed signals, even the most sophisticated decoding algorithms would have been rendered useless. 
 
 The time domain plot in Figure \ref{fig:sq-wave-time-c6} demonstrates effective sampling; the input square wave is captured with consistent frequency and amplitude. As is more visible in Figure \ref{fig:sq-wave-spectra-c6}, the estimated spectrum of the low-pass-filtered signal is almost exactly as desired; pass-band distortion is negligible and extremely steep roll-off is achieved in the transition band. Furthermore, stop-band attenuation is more than sufficient and, encouragingly, is very close to the 80dB design specification. Finally, after establishing effective sampling and filtering, the PSD estimate of the downsampled signal in Figure \ref{fig:sq-wave-ds-spectra-c6} verifies that the theoretical downsampling rate of $f_s'=\frac{1}{4}f_s = 64$Hz is able to maintain signal fidelity in the pass-band. The implication of this is that 4x fewer samples can be used to represent the original signal with negligible loss of information. This is invaluable for a system such as the one in this project that is severely constrained in memory and computational power.
 
 In summary, the DSP system proved very effective and was verified to operate in very close agreement with its design parameters. Worth emphasising is the fact that all necessary DSP operations are able to be performed in firmware on the ESP32. Not only is this a prerequisite for the end-to-end on-device processing objective, but also, it makes for a more flexible and future-proof system. New filter weights or other DSP-related parameters can simply be flashed onto the device, or indeed, uploaded `over the air' through a network connection if needed.
 
-\subsection{Decoding}
+\section{Decoding}
 Broadly speaking, the decoding accuracy results in Chapter \ref{chapter:results} demonstrate that the system developed in this project is a very promising first prototype. Before any further analysis of these results, it should be emphasised that while impressive, they were computed using data collected exclusively from the author owing to COVID19-related circumstances. Notwithstanding, several trials were conducted under various conditions and a stringent evaluation procedure, as detailed in Section \ref{subsection:evaluating-results}, was employed in an attempt to provide more robust results. 
 
 Trends in decoding accuracy with varying recording window size $T$ and number of calibration trials $p$ were largely similar across the GCCA and MsetCCA algorithms. Accordingly, these common trends are discussed below, followed by an analysis of their differences in Section \ref{subsection:algo-comparison-results}.
@@ -27,6 +24,7 @@ What is evident from both experiments with varying $T$ and $p$ is that the relia
 
 \subsubsection{Comparison of accuracy across algorithms}
 \label{subsection:algo-comparison-results}
+While trends in decoding accuracy between the GCCA and MsetCCA algorithms are similar, there are some notable differences. 
 
 \subsubsection{Online decoding}
 One of the biggest challenges of this project was to develop a system capable of end-to-end, real-time on-device decoding. That is, an embedded system capable of performing all operations needed to acquire, process, decode and communicate signals without outsourcing any computation off the device. 
@@ -81,27 +79,3 @@ The choice of MicroPython for development with the ESP32 proved to be extremely 
 Finally, ease of development using the MicroPython ecosystem is undoubtedly the easiest and most convenient of all other options. In particular, a Jupyter Notebook can be used over a serial connection to a MicroPython-compatible board to offer immediate and interactive development, experimentation and debugging. Compared to more traditional embedded ecosystems that require any code updates to be flashed onto the target MCU and rerun, this interactive environment is remarkably efficient. All components of this system - including those responsible for data acquisition, filtering, computation and communication - were developed in an interactive notebook environment before being compiled into frozen bytecode on the device.
 
 
-\section{Conclusion and Future Work}
-
-\subsubsection{Future work}
-While the system developed in this project performed remarkably well considering the constraints imposed on it, there are several areas for improvement. The following observations and suggestions are made for future extensions of this project. 
-% Evaluate if objectives initially laid out were achieved
-% - if not, why not
-% - if they had been stated differently/more realistically, would the outcome have been different?
-% - what would need to be done differently next time
-
-\subsubsection{Multi-channel sensing}
-As mentioned in the prior discussion, it is firmly believed that introducing additional EEG channels will significantly improve decoding performance. Furthermore, it is conceivable that the existing electronic hardware in this project could be adapted for multi-channel support by using a multi-channel analogue frontend (as is used on the OpenBCI Ganglion board, for example). The ESP32 SoC also has several available ADC inputs.
-
-\subsubsection{Algorithm expansion}
-While the algorithms selected in this project are some of the most popular and are close to the state-of-the-art at the time of writing, there are many other slight adjustments and extensions to these algorithms that warrant exploration. 
-
-\subsubsection{Broader testing set}
-As alluded to, the COVID-19 Pandemic made it difficult to gather data from different subjects during the course of this project. As a result, data was only collected on the author. This 
-- mention how calibration averaging over many more people may make generalisation feasible
-
-
-% \subsubsection{More robust testing}
-% Mention idea of switching squares around to test robustness
-
-\subsubsection{Improving comfort of electrodes}
