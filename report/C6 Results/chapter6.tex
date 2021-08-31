@@ -114,6 +114,7 @@ LpO CV was selected, as opposed to leave-one-out CV\footnote{a special case of L
     \caption[Leave-$p$-out cross validation (Lpo CV)]{Diagram illustrating leave-$p$-out cross validation (Lpo CV). Individual blocks in each row are different trials, each represented by a data matrix $X_n\in\R^{N_s\times N_c}$ where $N_s$ is the number of samples per trial and $N_c$ is the number of channels ($N_c=1$ in this project). For $n$ trials, there will be $\binom{n}{p}$ different calibration-validation splits (rows of blocks).}
     \label{fig:lpocv-diagram}
 \end{figure}
+Note that, contrary to Lpo CV, the more well-known k-fold cross-validation technique is a \textit{non-exhaustive} CV method as it does not test every combination of splits in the original data sample: it only selects train-validation splits whose elements are contiguous. In comparison, Lpo CV may select non-contiguous elements in either or both of the train and validation sets. Therefore, k-fold CV is a less computationally-intensive approximation of the more rigorous Lpo CV method. 
 
 \subsection{The effect of recording window length}
 \label{subsection:decoding-acc-ns-effect}
@@ -235,6 +236,21 @@ Figures \ref{fig:gcca-acc-nt} and \ref{fig:mset-acc-nt} show the effect of varyi
 \caption[MsetCCA decoding accuracy, varying $p$: effect of varying the number of training (calibration) trials $p$ on validation accuracy for recording windows of varying length $T$.]{\textbf{MsetCCA decoding accuracy, varying }$p$: effect of varying the number of training (calibration) trials $p$ on validation accuracy for recording windows of varying length $T$. In each subfigure, all trials are of equal length $T$ seconds which equates to $N_s$ samples at $f_s=256$Hz and $N_s'$ samples at the downsampled rate of $f_s'=64$Hz. Crosses connected with dashed traces denote average decoding accuracy across stimulus frequencies for a given $p=n, \, n\in\{1, \dots, 5\}$. Error bars denote one standard error of the mean.}
 \label{fig:mset-acc-nt}
 \end{figure}
+
+\begin{figure}[h]
+\subfloat[GCCA algorithm]{%
+  \includegraphics[clip,width=0.46\columnwidth]{report/C6 Results/assets/freq-var-gcca.pdf}%
+  \label{subfig:freq-var-gcca}
+}
+\hfill
+\subfloat[MsetCCA algorithm]{%
+  \includegraphics[clip,width=0.46\columnwidth]{report/C6 Results/assets/freq-var-mcca.pdf}%
+  \label{subfig:freq-var-mcca}
+}
+\caption[Graphs showing variance in decoding accuracy across the triad of stimulus frequencies at each value of $p$.]{Graphs showing variance in decoding accuracy across the triad of stimulus frequencies at each value of $p$. The standard deviation in accuracy over frequencies $\sigma_f^2$ is reported. Different colour traces represent recording windows of different lengths as labelled.}
+\label{fig:freq-var-plots}
+\end{figure}
+
 
 \subsection{Generalisation testing}
 \label{subsection:generalisation-testing}
