@@ -6,11 +6,7 @@
 
 \section{Design of the SSVEP Stimuli}
 \label{subsection:ssvep-stimuli}
-A key consideration in the design of the SSVEP stimuli is the stimulus frequencies $f_1, \dots, f_n$ to use. As mentioned in Section \ref{subsection:time-frequency-considerations-c2}, similar studies typically use stimulus frequencies between 7Hz and 12Hz for this task. Furthermore, as detailed in Section \ref{subsection:CCA-c2}, CCA and CCA-based decoding algorithms involve a harmonic reference signal set. An important consideration is the \textit{number of harmonics} to include in these reference sets. In order to allow for a fundamental stimulus frequency range of 7Hz to 12Hz, it is only feasible to include one harmonic ($N_h=1$) in the reference set since the second harmonic of a 12Hz stimulus signal would occur at 36Hz which would likely be attenuated somewhat by the analogue low-pass filter (corner frequency of 37.4Hz) and low-pass filter dynamics of the adjustable output amplifier (corner frequency of 36.35Hz) shown in Figure \ref{fig:analogue-system-c4}. Furthermore, including the second harmonic for each stimulus frequency would have significant memory and computation implications. It is for these reasons that only a single harmonic was used in this system (where applicable).
-
-\subsection{SSVEP stimulus interface}
-
-Naturally, an important part of the SSVEP-based BCI system is the SSVEP stimuli which are to be presented to individuals participating in the exhibition (or in general, anyone interacting with the system thereafter). Taking into account design parameters such as stimulus colour, position and contrast mentioned in the literature cited in Section \ref{subsection:evoking-measuring-ssveps}, a basic user interface (UI) was designed with a series of flashing squares as depicted in Figure \ref{fig:ssvep-squares-c5}. This UI was implemented\footnote{code implementation available \href{https://github.com/JamesTev/EEG-decoding/blob/master/ui/ssvep_squares.html}{here}.} as a lightweight HTML page with basic CSS styling and Javascript to handle animation (flickering of the squares). This decision was made to allow for the simplest and most convenient deployment across any device capable of displaying a web page (mobile or otherwise). The number of blocks being displayed and their labels are subject to adjustment in accordance with other elements of the demonstration beyond the scope of this project.
+A key consideration in the design of the SSVEP stimuli is the stimulus frequencies $f_1, \dots, f_n$ to use. As mentioned in Section \ref{subsection:time-frequency-considerations-c2}, similar studies typically use stimulus frequencies between 7Hz and 12Hz for this task. Furthermore, as detailed in Section \ref{subsection:CCA-c2}, CCA and CCA-based decoding algorithms involve a harmonic reference signal set. An important consideration is the \textit{number of harmonics} to include in these reference sets. In order to allow for a fundamental stimulus frequency range of 7Hz to 12Hz, it is only feasible to include one harmonic ($N_h=1$) in the reference set since the second harmonic of a 12Hz stimulus signal would occur at 36Hz which would likely be attenuated somewhat by the analogue low-pass filter (corner frequency of 37.4Hz) and low-pass filter dynamics of the adjustable output amplifier (corner frequency of 36.35Hz) shown in Figure \ref{fig:analogue-system-c4}. Furthermore, including the second harmonic for each stimulus frequency would have significant memory and computation implications. It is for these reasons that only a single harmonic was used in this system (where applicable). For the experiments conducted in this project, three stimulus frequency at 7, 10 and 12Hz were used. 
 
 \begin{figure}[!htb]
     \centering
@@ -19,7 +15,11 @@ Naturally, an important part of the SSVEP-based BCI system is the SSVEP stimuli 
     \label{fig:ssvep-squares-c5}
 \end{figure}
 
-Note that, external factors related to this project may only require some subset of the stimuli shown in Figure \ref{fig:ssvep-squares-c5}; for example, the square corresponding to `down' may be omitted if only the other three actions are required in the game/simulation. 
+\subsection{SSVEP stimulus interface}
+
+Naturally, an important part of a SSVEP-based BCI system is the SSVEP stimuli which are to be presented to individuals participating in the exhibition (or in general, anyone interacting with the system thereafter). Taking into account design parameters such as stimulus colour, position and contrast mentioned in the literature cited in Section \ref{subsection:evoking-measuring-ssveps}, a basic user interface (UI) was designed with a series of flashing squares as depicted in Figure \ref{fig:ssvep-squares-c5}. This UI was implemented\footnote{code implementation available \href{https://github.com/JamesTev/EEG-decoding/blob/master/ui/ssvep_squares.html}{here}.} as a lightweight HTML page with basic CSS styling and Javascript to handle animation (flickering of the squares). This decision was made to allow for the simplest and most convenient deployment across any device capable of displaying a web page (mobile or otherwise). 
+
+Note that external factors related to this project may only require some subset of the stimuli shown in Figure \ref{fig:ssvep-squares-c5}; for example, the square corresponding to `down' may be omitted if only the other three actions are required in the game/simulation. The configuration shown is for indicative purposes only.
 
 \section{Design of the Digital System}
 \begin{figure}[!htb]
@@ -42,7 +42,7 @@ A crucial part in the design of the BCI system is the digital signal processing 
 \end{figure}
 
 \subsubsection{Sampling and decimation}
-The analogue signal $x(t)$ is digitised to $x_1[n]$ using the 12-bit SAR ADC on-board the ESP32. A sampling frequency of $f_s=256$Hz was selected based for several reasons. First, this is a typical value mentioned in the literature as noted in Section \ref{subsection:time-frequency-considerations-c2}. Second, and more importantly, considering the SSVEP stimulus frequency band of 6 - 12Hz as mentioned in Section \ref{subsection:ssvep-stimuli}, and allowing for one reference signal harmonic in CCA-based decoding algorithms, the maximum theoretical frequency required is $f_{\textrm{max}}=24$Hz. In order to satisfy the Nyquist sampling criterion, sampling at $f_s > 2f_{\textrm{max}} = 48$Hz is required. 64Hz was identified as an appropriate fit as it provides some frequency margin for filter roll-off and it is a factor of 256Hz which facilitates decimation by an integer factor.
+The analogue signal $x(t)$ is digitised to $x_1[n]$ using the 12-bit SAR ADC on-board the ESP32. A sampling frequency of $f_s=256$Hz was selected based for several reasons. First, this is a typical value mentioned in the literature as noted in Section \ref{subsection:time-frequency-considerations-c2}. Second, and more importantly, considering the SSVEP stimulus frequency band of 6 - 12Hz as mentioned in Section \ref{subsection:ssvep-stimuli}, and allowing for one reference signal harmonic in CCA-based decoding algorithms, the maximum theoretical frequency required is $f_{\textrm{max}}=24$Hz. Incorporating a small margin for roll-off of the low-pass filter with $f_c=26$Hz, sampling at $f_s > 2f_{\textrm{max}} = 56$Hz is required in order to satisfy the Nyquist sampling criterion and avoid aliasing. 64Hz was identified as an appropriate fit as it is a factor of 256Hz which facilitates decimation by an integer factor.
 
 \begin{figure}
     \centering
@@ -66,7 +66,7 @@ Infinite impulse response (IIR) filters are typically more suitable for small, r
 \end{itemize}
 Although FIR filters typically offer greater stability and controllability owing to only having zeros in their transfer functions, the aforementioned benefits of IIR filters were deemed to be more important for this application. 
 
-Figure \ref{fig:digital-filt-resp} shows the frequency response of three different commonly used IIR digital filters: type I and II Chebyshev filters, as well an elliptical filter. Each of these filters were designed to meet the following requirements:
+Figure \ref{fig:digital-filt-resp} shows the frequency response of three different commonly used IIR digital filters: type I and II Chebyshev filters, as well as an elliptical filter. Each of these filters were designed to meet the following requirements:
 \begin{itemize}
 \label{list:filter-design-reqs}
     \item maximum filter order of $n=10$
@@ -151,7 +151,7 @@ with open('/logs/log-10072021.txt') as f:
 \end{listing}
 
 \subsection{Numerical computation}
-An additional important motivation for using MicroPython over the more traditional C/C++ approach is the ability to use an extremely convenient open source MicroPython module called \texttt{ulab}\footnote{Source code and documentation available \href{https://github.com/v923z/micropython-ulab}{here}.}. The \texttt{ulab} project was created to offer a subset of the very popular \texttt{numpy} numerical computing library for Python which offers highly performant array computing and linear algebra functionality. It also implements a small subset of functionality offered by Scipy; the equally popular scientific computing library for Python. Some of the most notable features offered by this module include \cite{ulab}:
+An additional important motivation for using MicroPython over the more traditional C/C++ approach is the ability to use an extremely convenient open source MicroPython module called \texttt{ulab}\footnote{Source code and documentation available \href{https://github.com/v923z/micropython-ulab}{here}.}. The \texttt{ulab} project was created to offer a subset of the very popular \href{https://numpy.org/}{NumPy} numerical computing library for Python which offers highly performant array computing and linear algebra functionality. It also implements a small subset of functionality offered by \href{https://www.scipy.org/}{SciPy}; the equally popular scientific computing library for Python. Some of the most notable features offered by this module include \cite{ulab}:
 \begin{enumerate}
     \item compact, iterable and sliceable array structures for numerical data up to 4 dimensions
     \item extremely frugal with RAM usage
@@ -198,11 +198,11 @@ Once processed and decoded, data from many BCI devices must be streamed to a cen
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\textwidth]{network-diagram}
-    \caption{Diagram showing the client-broker MQTT interface for relaying data captured by remote BCI devices to an AWS cloud service and thereafter, to a web application for visualisation. }
+    \caption[Diagram showing the client-broker MQTT interface for communication with AWS IoT Core]{Diagram showing the client-broker MQTT interface for relaying data captured by remote BCI devices to an AWS cloud service and thereafter, to a web application for visualisation. }
     \label{fig:networking-diagram-c5}
 \end{figure}
 
-As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a message broker (server) and several clients. In this case, the AWS IoT service acts as an MQTT broker that receives messages published by remote ESP32 BCI clients. Each of the clients have a unique client ID but subscribe to a common topic that the AWS service expects. Although the design of subsequent elements in the AWS cloud pipeline was not included in this project, a schematic representation is presented in Figure \ref{fig:networking-diagram-c5}: data received from BCI clients over MQTT is streamed to a web application that can be view in real time.
+As seen in Figure \ref{fig:networking-diagram-c5}, the MQTT protocol defines a message broker (server) and several clients. In this case, the AWS IoT service acts as an MQTT broker that receives messages published by remote ESP32 BCI clients. Each of the clients have a unique client ID but subscribe to a common topic that the AWS service expects. Although the design of subsequent elements in the AWS cloud pipeline was not included in this project, a schematic representation is presented in Figure \ref{fig:networking-diagram-c5}: data received from BCI clients over MQTT is streamed to a web application which displays EEG data in real time.
 
 \subsection{Logging}
 % Discuss logging server and the potential for network logging ot anywhere
@@ -211,11 +211,11 @@ Data logging from the ESP32-based BCI hardware was crucial for this project. Thi
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=0.9\textwidth]{web-logger-diagram}
-    \caption{Diagram showing the client-broker MQTT interface for relaying data captured by remote BCI devices to an AWS cloud service and thereafter, to a web application for visualisation. }
+    \caption{Diagram showing the web logger interface}
     \label{fig:web-logger-c5}
 \end{figure}
 
-Figure \ref{fig:web-logger-c5} provides an overview of the web-based logging system. Potentially many ESP32 devices collect data and periodically log data to a web server. Typically, a REST API (application progamming interface) is deployed on the server which accepts requests from clients and processes and stores request data. In this project, a basic REST API\footnote{source code available \href{https://github.com/JamesTev/EEG-decoding/blob/master/eeg_lib/logging_server.py}{here}.} was created using \href{https://flask.palletsprojects.com/en/2.0.x/}{Flask}, the open source web micro-framework written in Python. 
+Figure \ref{fig:web-logger-c5} provides an overview of the web-based logging system. Potentially many ESP32 devices collect data and periodically log data to a web server. Typically, a REST API (application progamming interface) is deployed on the server which accepts requests from clients and processes and stores request data. In this project, a basic REST API\footnote{source code available \href{https://github.com/JamesTev/EEG-decoding/blob/master/eeg_lib/logging_server.py}{here}.} was created using \href{https://flask.palletsprojects.com/en/2.0.x/}{Flask}, an open source web micro-framework written in Python. 
 
 \begin{listing}[h]
 \small
@@ -240,18 +240,18 @@ Figure \ref{fig:web-logger-c5} provides an overview of the web-based logging sys
 The JSON object in Listing \ref{listing:logging-payload} shows an example of a data payload sent via an ESP32 client to the logging API. Decoded data, as well as raw data used to perform on-board decoding, is compiled into each data payload. Each payload is then sent via an HTTP \texttt{POST} request to the logging server. Once received and verified by the API, data is written to a log file stored on the server. Note that in this project, the server and API were run on a local network and data was thus stored on a personal computer. However, the system would work identically if the server was deployed in the cloud. This would allow data to be logged by remote BCI devices from anywhere in the world and would not require users of the devices to run their own local server. This could facilitate a decentralised data acquisition system that could enable wide-scale data collection.  
 
 \subsection{Digital filtering}
-The digital low-pass filter described in Section \ref{subsection:digital-filtering} whose frequency response is shown in Figure \ref{fig:digital-filt-resp} was designed using \href{https://docs.scipy.org/doc/scipy/index.html}{SciPy}, the popular open source scientific computing library for Python. In particular, given the filter design requirements, the \texttt{scipy.signal.ellip()} function was used to generate filter coefficients. Using the \texttt{output==`sos'} argument, the filter coefficients were computed in a cascaded second-order sections (SOS) representation. The SOS representation of an IIR filter with digital transfer function $H(z)$ is as follows:
+The digital low-pass filter described in Section \ref{subsection:digital-filtering} whose frequency response is shown in Figure \ref{fig:digital-filt-resp} was designed using SciPy. In particular, given the filter design requirements, the \texttt{scipy.signal.ellip()} function was used to generate filter coefficients. Using the \texttt{output==`sos'} argument, the filter coefficients were computed in a cascaded second-order sections (SOS) representation. The SOS representation of an IIR filter with digital transfer function $H(z)$ is as follows:
 \begin{equation}
 H(z)=K\prod_{n=0}^{N-1} \frac{b_{n,\, 0}+b_{n,\, 1} z^{-1}+b_{n,\, 2} z^{-2}}{1+a_{n,\, 1} z^{-1}+a_{n,\, 2}z^{-2}},
 \label{eq:sos-structure}
 \end{equation}
-where $K$ is a gain scalar, $N$ is the number of sections needed to realise the desired filter order and $a_n$ and $b_n$ are the reverse and forward coefficients for section $n$ respectively. Notice that in the form in (\ref{eq:sos-structure}), only a highest order of 2 is present for any component. This cascaded lower-order form offers greater numerical stability and less sensitivity to quantisation of coefficients than standard higher order polynomials.
+where $K$ is a gain scalar, $N$ is the number of sections and $a_n$ and $b_n$ are the reverse and forward coefficients for section $n$ respectively. Notice that in the form in (\ref{eq:sos-structure}), only a highest order of 2 is present for any component. This cascaded lower-order form offers greater numerical stability and less sensitivity to quantisation of coefficients than standard higher order polynomials.
 
 The filter coefficients, once computed offline, were stored as constants in the the ESP32 firmware (in particular, in the \texttt{lib.signal} module). As there was no need to recompute or otherwise modify these coefficients, they were stored in read-only flash memory to persist across power cycles and save space in RAM. In order to run digital filtering on the ESP32 itself, the convenient \texttt{scipy.signal.sosfilt()} from the \texttt{ulab} module was used. This function simply takes the pre-computed SOS coefficients and the input signal and returns the filtered version. Tests were performed to ensure equivalence between this implementation and the standard implementation in the fully-fledged SciPy module.  
 
 \section{Algorithm Implementation}
 \subsection{Eigenvalue algorithms}
-As elaborated on in Chapter \ref{chapter:theory-development}, the decoding algorithms explored in this project are all optimisation problems that can be reformulated as eigenvalue problems. Consequently, an `eigen' function capable of finding the eigenvalues (and corresponding eigenvectors) of an arbitrary matrix was crucial in the design of this system. The \texttt{ulab} module conveniently includes a basic eigen function of this sort: \texttt{numpy.linalg.eig()}. However, the severe limitation with this implementation is that it only works with \textit{symmetric} matrices (i.e. matrices with real eigenvalues). For signal decoding, many of the eigenvalue problems arising in this project involve asymmetric matrices. Thus, an alternative solution needed to be sought. 
+As elaborated on in Chapter \ref{chapter:theory-development}, the decoding algorithms explored in this project all resolve to constrained optimisation problems that can be reformulated as eigenvalue problems. Consequently, an `eigen' function capable of finding the eigenvalues (and corresponding eigenvectors) of an arbitrary matrix was crucial in the design of this system. The \texttt{ulab} module conveniently includes a basic eigen function of this sort: \texttt{numpy.linalg.eig()}. However, the severe limitation with this implementation is that it only works with \textit{symmetric} matrices (i.e. matrices with real eigenvalues). For signal decoding, many of the eigenvalue problems arising in this project involve asymmetric matrices. Thus, an alternative solution needed to be sought. 
 
 After much experimentation and difficulty finding an analytical solution that could work\footnote{produce the correct result and maintain numerical stability} under all conditions, it was decided that \textit{iterative} eigenvalue algorithms should be explored. 
 
@@ -273,12 +273,12 @@ The simple but elegant power iteration algorithm explored in Section \ref{subsec
 As discussed in Section \ref{subsection:simultaneous-iteration}, the Simultaneous Iteration algorithm provides an effective extension of Power Iteration by solving for all eigenvectors simultaneously. The pseudocode for the implementation of this algorithm is given in Algorithm \ref{alg:simultaneous-iteration}.
 \begin{algorithm}
 \begin{algorithmic}
-\State Pick an initial basis for $\{\vv^{(0)}, \dots, \vv^{(d)} \}$ for $\R^d$
+\State Pick an initial basis for $\{\vv^{(0)}, \dots, \vv^{(d)} \}$ for $\R^d$ \Comment{initialise set of random basis vectors}
 \State Construct the matrix $\mV = \left[\begin{array}{l|l|l}\vv_1^{(0)} & \dots & \vv_d^{(0)}\end{array}\right]$
 \State Obtain the factors $\mQ^{(0)}\mR^{(0)} = \mV^{(0)}$ \Comment{compute QR factorisation of $\mV^{(0)}$}
 % \Require 
 \For{$k=1, 2, \dots, \, K$ }
-    \State $\mW \gets \mW = \mA\mQ^{(k-1)}$
+    \State $\mW \gets \mW = \mA\mQ^{(k-1)}$ \Comment{update step}
     \State Obtain the factors $\mQ^{(k)}\mR^{(k)} = \mW$ \Comment{extract orthonormal column vectors of $\mW$ from $\mQ^{(k)}$}
 \EndFor
 \end{algorithmic}
@@ -290,7 +290,7 @@ As discussed in Section \ref{subsection:simultaneous-iteration}, the Simultaneou
 Finally, as revealed in Section \ref{subsection:qr-iteration}, the QR Iteration algorithm is a more convenient form of the Simultaneous Iteration algorithm that is more commonly used in practice. Pseudocode for its implementation in this project is given in Algorithm \ref{alg:qr-iteration}.
 \begin{algorithm}
 \begin{algorithmic}
-\State $\mA^{(0)} \gets \mA$
+\State $\mA^{(0)} \gets \mA$ 
 \For{$k=1, 2, \dots, \, K$ }
     \State Obtain the factors $\mQ^{(k)}\mR^{(k)} = \mA^{(k-1)}$ \Comment{perform QR factorisation on $\mA^{(k-1)}$}
     \State $\mA^{(k)} \gets \mR^{(k)}\mQ^{(k)}$ \Comment{update step detailed in \cite{panju-iterative-eig}}
@@ -332,7 +332,7 @@ The implementation of the CCA algorithm introduced in Section \ref{subsection:CC
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Function{ComputeCCA}{$\mX,\,\mY,\, \epsilon$} \Comment{Input signal $\mX \in \R^{N_c \times N_s}$ and ref. signal $\mY \in \R^{q\times N_s}, \, q\in \mathbb{N}$ }
-\State generate $\mY$ \Comment{Form harmonic reference set $\mY \in \R^{2N_h \times N_s}$}
+% \State generate $\mY$ \Comment{Form harmonic reference set $\mY \in \R^{2N_h \times N_s}$}
 \State $\mC_{\mX\mX} \gets \mC_{\mX\mX} = \mX\mX^\top$ \Comment{Signal covariance matrix}
 \State $\mC_{\mY\mY} \gets \mC_{\mY\mY} = \mY\mY^\top$ \Comment{Reference covariance matrix}
 \State $\mC_{\mX\mY} \gets \mC_{\mX\mY} = \mX\mY^\top$ \Comment{Cross covariance matrix}
@@ -395,7 +395,7 @@ The implementation of the MsetCCA algorithm introduced in Section \ref{subsectio
 \begin{algorithmic}[1]
 \Function{FitMCCA}{$\mX$} \Comment{Input training/calibration data matrix $\mX \in \R^{N_t \times N_s}$ }
 \State $\mR \gets \mR = \mX\mX^\top$ \Comment{Compute inter-trial covariance matrix}
-\State $\mS \gets \mS = \textrm{diag}(\mR)$ \Comment{Compute intra-trial covariance matrix}
+\State $\mS \gets \mS = \textrm{diag}(\mR)$ \Comment{Construct intra-trial covariance matrix using diagonal entries of $\mR$}
 \State $\vw^*, \lambda^* \gets (\mR-\mS)\vw_{i}=\lambda_{i} \mS \vw_{i}, \quad \forall i \in\{1, \ldots, N_t\}$ \Comment{Find eig. pair with max eig. val $\lambda^*$ (Algorithm \ref{alg:gen-eig-algo})}
 \State $\mY^* \gets \mY = \begin{bmatrix}w^*_1 \vx_1 & w^*_2 \vx_2 & \dots & w^*_{N_t} \vx_{N_t} \end{bmatrix}$ \Comment{Compute opt. reference $\mY \in \R^{N_t\times N_s}$ with $\vx_i$ as rows of $\mX$.}
 \State store $\mY^*$

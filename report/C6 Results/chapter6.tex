@@ -7,13 +7,13 @@
 % ** remember to include results of all early, prelim experiments including the OpenBCI experiments and periodogram plots of the alpha energy experiments with the initial Frankenstein hardware.
 
 \section{Hardware Verification and Testing}
-This section details the results of the various verification tests mentioned in Section \ref{subsection:testing-verification-method-c4}. The purpose of these tests was to verify that all core components of the designed system performed as expected. After basic tests to verify firmware integrity and communication with the ESP32-based target board passed, the digital signal processing (DSP) system was investigated. The results of important diagnostic tests are detailed below. Throughout this section, "the hardware" refers to the electronic hardware introduced in Section \ref{subsection:electronic-hardware-proto} and pictured in Figure \ref{fig:esp-hardware}.
+This section details the results of the various verification tests mentioned in Section \ref{subsection:testing-verification-method-c4}. The purpose of these tests was to verify that all core components of the designed system performed as expected. After basic tests to verify firmware integrity and communication with the ESP32-based target board passed, the digital signal processing (DSP) system was investigated. The results of important diagnostic tests are detailed below. Throughout this section, `the hardware' refers to the electronic hardware introduced in Section \ref{subsection:electronic-hardware-proto} and pictured in Figure \ref{fig:esp-hardware}.
 
 \subsection{DSP system}
-As explained in Section \ref{fig:digital-system-c5}, the DSP system is crucial for preparing analogue signals acquired from hardware prior to decoding. In order to test several components of this system simultaneously, a square wave signal $x[n]$ at fundamental frequency $f_x^{(0)}=12$Hz was fed to the ADC of the ESP32. Sampling was set to $f_s=256$Hz and where applicable, downsampling to $f_s^'=64$Hz was used. Owing to the lack of access to a signal generator or other laboratory equipment, the input signal $x[n]$ was generated using a hardware timer on board the ESP32. This experiment was designed to test the following components of the DSP system as follows:
+As explained in Section \ref{fig:digital-system-c5}, the DSP system is crucial for preparing analogue signals acquired from hardware prior to decoding. In order to test several components of this system simultaneously, a square wave signal $x[n]$ at fundamental frequency $f_x^{(0)}=12$Hz was fed to the ADC of the ESP32. Sampling was set to $f_s=256$Hz and where applicable, downsampling to $f_s'=64$Hz was used. Owing to the lack of access to a signal generator or other laboratory equipment, the input signal $x[n]$ was generated using a hardware timer on board the ESP32. This experiment was designed to test the following components of the DSP system as follows:
 \begin{enumerate}
     \item \textbf{sampling}: a basic sanity check to verify that a square wave at 12Hz was indeed measured by the ADC. This also offered a means of inspecting the consistency (both in amplitude and frequency) of the measured signal.
-    \item \textbf{filtering}: the input signal $x[n]$ was filtered by the onboard digital low-pass filter described in Section \ref{subsection:digital-filtering} to yield $y[n]$. Given the filter's corner frequency of $f_c=26$Hz, $y[n]$ should only contain the fundamental frequency $f_x^{(0)}=12$Hz since higher order harmonics of the square wave input at $\{f_x^{(k)} |f_x^{(k)}=(2k-1)f_x^{(0)}, \, k=2,3, \dots\} = \{36\text{Hz}, 60\text{Hz}, \dots\}$ should be fully attenuated. Furthermore, the measured spectrum of $y[n]$ offers a way to compare the actual and designed behaviour of the filter.
+    \item \textbf{filtering}: the input signal $x[n]$ was filtered by the onboard digital low-pass filter described in Section \ref{subsection:digital-filtering} to yield $y[n]$. Given the filter's corner frequency of $f_c=26$Hz, $y[n]$ should only contain the fundamental frequency $f_x^{(0)}=12$Hz since higher order harmonics of the square wave input at $\{f_x^{(k)} |f_x^{(k)}=(2k-1)f_x^{(0)}, \, k=2,3, \dots\} = \{36\text{Hz}, 60\text{Hz}, \dots\}$ should be largely attenuated. Furthermore, the measured spectrum of $y[n]$ offers a way to compare the actual and designed behaviour of the filter.
     \item \textbf{downsampling}: a simple check to confirm that, given all prior design decisions, downsampling does not distort the originally measured signal excessively in the frequency band of interest (around $7-12$Hz). With low-pass filtering in place, there should be no aliasing or artefacts introduced.
 \end{enumerate}
 
@@ -44,7 +44,7 @@ While not quite impulses, power peaks of $\hat{P}_x(\omega)$ in Figure \ref{fig:
     \label{fig:sq-wave-spectra-c6}
 \end{figure}
 
-Along with $\hat{P}_x(\omega)$ as before, Figure \ref{fig:sq-wave-ds-spectra-c6} shows the estimated spectra $\hat{P}_z(\omega)$ and $\hat{P}_\text{alias}(\omega)$ of $z[n]$. $\hat{P}_z(\omega)$ corresponds to the downsampled version of the filtered output $y[n]$ and $\hat{P}_\text{alias}(\omega)$ is the estimated spectrum of $x[n]$ after being downsampled with \textit{no} prior filtering. Both resampled signals were downsampled by a factor of 4 to $f_s'=64$Hz. As is particularly evident from the artefacts at 4Hz, 20Hz and 27Hz in the Welch-averaged periodogram in Figure \ref{fig:sq-wave-ds-spectra-c6}, aliasing has occurred in $\hat{P}_\text{alias}(\omega)$. The full spectrum of $\hat{P}_x(\omega)$ in Figure \ref{fig:sq-wave-spectra-c6} explains this behaviour: $x[n]$ contains substantial energy at higher frequencies past $f>f_n'=32$Hz where $f_n'$ is the Nyquist frequency for the downsampled rate of $f_n'=64$Hz. This demonstrates the necessity for low-pass filtering to isolate the frequency band of interest before downsampling. 
+Along with $\hat{P}_x(\omega)$ as before, Figure \ref{fig:sq-wave-ds-spectra-c6} shows the estimated spectra $\hat{P}_z(\omega)$ and $\hat{P}_\text{alias}(\omega)$, where $\hat{P}_z(\omega)$ corresponds to $z[n]$, the downsampled version of the filtered output $y[n]$ and $\hat{P}_\text{alias}(\omega)$ is the estimated spectrum of $x[n]$ after being downsampled with \textit{no} prior filtering. Both resampled signals were downsampled by a factor of 4 to $f_s'=64$Hz. As is particularly evident from the artefacts at 4Hz, 20Hz and 27Hz in the Welch-averaged periodogram in Figure \ref{fig:sq-wave-ds-spectra-c6}, aliasing has occurred in $\hat{P}_\text{alias}(\omega)$. The full spectrum of $\hat{P}_x(\omega)$ in Figure \ref{fig:sq-wave-spectra-c6} explains this behaviour: $x[n]$ contains substantial energy at higher frequencies past $f>f_n'=32$Hz where $f_n'$ is the Nyquist frequency for the downsampled rate of $f_n'=64$Hz. This demonstrates the necessity for low-pass filtering to isolate the frequency band of interest before downsampling. 
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{sq_wave_filtering_ds_spectra}
@@ -68,12 +68,12 @@ On the other hand, Figure \ref{fig:sq-wave-ds-spectra-c6} also demonstrates the 
 \label{fig:alpha-periodograms}
 \end{figure}
 
-As mentioned in Chapter \ref{chapter:experimental-procedure}, the rudimentary headband discussed in Section \ref{subsection:mech-hardware-frankenstein} was created as a means of acquiring and testing real-life data from the electronic hardware prototype introduced in Section \ref{subsection:electronic-hardware-proto}. After verifying the fidelity of the DSP system, a basic BCI test known as the 'alpha test' was performed. This involves measuring the EEG signals generated by the brain's visual cortex during two distinct states: with eyes open and eyes closed. In particularly, signal energy in the alpha band between 8-12Hz is observed. As mentioned briefly in Section \ref{subsection:nature-of-eeg-signals}, a working BCI should be able to discern greater energy in the alpha band when a subject's eyes are closed compared to when open.
+As mentioned in Chapter \ref{chapter:experimental-procedure}, the rudimentary headband discussed in Section \ref{subsection:mech-hardware-frankenstein} was created as a means of acquiring and testing real-life data from the electronic hardware prototype introduced in Section \ref{subsection:electronic-hardware-proto}. After verifying the fidelity of the DSP system, a basic BCI test known as the 'alpha test' was performed. This involves measuring the EEG signals generated by the brain's visual cortex during two distinct states: with eyes open and eyes closed. In particular, signal energy in the alpha band between 8-12Hz is observed. As mentioned briefly in Section \ref{subsection:nature-of-eeg-signals}, a working BCI should be able to discern greater energy in the alpha band when a subject's eyes are closed compared to when open.
 
-Figure \ref{fig:alpha-periodograms} shows the estimated power spectra recorded over several trials in each of the two aforementioned states. Particularly around 8Hz, Subfigure \ref{subfig:alpha-eyes-closed} representing the eyes closed state shows noticeably more signal power in the alpha band relative to the rest of the signal (compared to the eyes open state). This is suggestive of the presence of valid EEG signals as opposed to just random noise.
+Figure \ref{fig:alpha-periodograms} shows the estimated power spectra recorded over several trials in each of the two aforementioned states. Particularly around 8Hz, Subfigure \ref{subfig:alpha-eyes-closed} representing the eyes-closed state shows noticeably more signal power in the alpha band relative to the rest of the signal (compared to the eyes-open state). This is suggestive of the presence of valid EEG signals as opposed to just random noise.
 
 \subsection{Execution time profiling}
-A number of trials were performed to determine the consistency of execution time across key system processes in the sample-decode-publish loop. Figure \ref{fig:timing-distributions} shows the distributions of execution times recorded over several trials. In each trial, all possible functionality was enabled so as to test maximum computational loading. "Auxiliarly processing time" is defined as the processing time in each loop required for any operations \textit{besides} decoding computation and publishing to AWS over MQTT. 
+A number of trials were performed to determine the consistency of execution time across key system processes in the sample-process-decode-publish loop. Figure \ref{fig:timing-distributions} shows the distributions of execution times recorded over several trials. In each trial, all possible functionality was enabled so as to test maximum computational loading. `Auxiliarly processing time' is defined as the processing time in each loop required for any operations \textit{besides} decoding computation and publishing to AWS over MQTT. 
 
 \begin{figure}[htp]
 \centering
@@ -91,7 +91,7 @@ A number of trials were performed to determine the consistency of execution time
   \includegraphics[clip,width=0.3\columnwidth]{report/C6 Results/assets/aux_proc_tim_distr.pdf}%
   \label{subfig:timing-aux}
 }
-\caption[Execution time distributions for key processes in the sample-decode-publish loop.]{Execution time distributions for key processes in the sample-decode-publish loop. Auxiliary processing refers to any processing besides that which is required for decoding and publishing data over MQTT.}
+\caption[Execution time distributions for key processes in the sample-process-decode-publish loop.]{Execution time distributions for key processes in the sample-decode-publish loop. Auxiliary processing refers to any processing besides that which is required for decoding and publishing data to the cloud.}
 \label{fig:timing-distributions}
 \end{figure}
 
@@ -99,7 +99,7 @@ A number of trials were performed to determine the consistency of execution time
 \section{Experimental Decoding Results}
 In this section, the experimental results of various decoding algorithms introduced in Chapter \ref{chapter:lit-review} are reported. Unfortunately, because only single channel EEG signals were available using the hardware provided in this project, the TRCA algorithm was no longer appropriate. This is due to the fact that it tries to find optimal \textit{spatial} filters for task-related discrimination; effectively optimally-weighted combinations of multiple channels. Clearly, having only a single channel renders this approach ineffective. 
 
-The decoding results of the CCA algorithm are presented briefly, however, greater attention is paid to those of the GCCA and MsetCCA algorithms. The latter two algorithms use data from across trials to form a `reference template' in addition to the ordinary CCA method that only compares measured signals with the artificially-constructed sinusoidal reference set. 
+% The decoding results of the CCA algorithm are presented briefly, however, greater attention is paid to those of the GCCA and MsetCCA algorithms. The latter two algorithms use data from across trials to form a `reference template' in addition to the ordinary CCA method that only compares measured signals with the artificially-constructed sinusoidal reference set. 
 
 \subsubsection{Evaluation of results}
 \label{subsection:evaluating-results}
@@ -107,7 +107,7 @@ Worth noting is the method used to evaluate results reported below. For template
 
 Leave-$p$-out cross-validation (LpO CV) was employed in order to minimise the risk of selection bias or overfitting to pathological test cases. Usually, LpO CV refers to \textit{training} a model on $n-p$ observations and \textit{validating} on the held-out $p$ validations (with $p<n$). However, in this project, template-based algorithms were instead \textit{calibrated} on the smaller $p$-partition and validated on the remaining $n-p$ samples. This more appropriately reflects the practical dynamic of this system where only few calibration trials will be available before inference needs to begin.
 
-LpO CV was selected, as opposed to leave-one-out CV\footnote{a special case of LpO CV with $p=1$ that is more commonly used}, for example, as it provides the ability to vary $p$ in order to investigate the effect of more or fewer calibration trials on decoding performance. For $n$ trials or observations, LpO CV will generate $\binom{n}{p}$ unique calibration-validation splits\footnote{This would generally become computationally infeasible for even modest $n$. However, the calibration or `training' processes for the algorithms in this project were not computationally intensive and the number of trials in each experiment never exceeded 10.}. Validation metrics, such as accuracy, are then averaged across all splits (unless otherwise stated). This is depicted more graphically in Figure \ref{fig:lpocv-diagram}.
+LpO CV was selected, as opposed to leave-one-out CV\footnote{a special case of LpO CV with $p=1$ that is more commonly used}, for example, as it provides the ability to vary $p$ in order to investigate the effect of more or fewer calibration trials on decoding performance. For $n$ trials or observations, LpO CV will generate $\binom{n}{p}$ unique calibration-validation splits\footnote{This would generally become computationally infeasible for even modest $n$. However, the calibration or `training' processes for the algorithms in this project were not computationally intensive and the number of trials in each experiment never exceeded 10.}. Validation metrics, such as accuracy, are then averaged across all splits (unless otherwise stated). This is depicted graphically in Figure \ref{fig:lpocv-diagram}.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.65\textwidth]{LpoCV}
@@ -118,9 +118,10 @@ Note that, contrary to Lpo CV, the more well-known k-fold cross-validation techn
 
 \subsection{The effect of recording window length}
 \label{subsection:decoding-acc-ns-effect}
-As alluded to in Section \ref{subsection:time-frequency-considerations-c2}, arguably the most important factor in the decoding system - besides the actual algorithm used - is the length of the recording window $T$. As cited in the literature review, decoding accuracy almost always improved with increasing $T$. This is expected; longer time windows offer more samples to the decoding algorithm being used. However, the trade off is decreased information transfer rate (ITR) which results in a more sluggish BCI system. 
+As alluded to in Section \ref{subsection:time-frequency-considerations-c2}, arguably the most important factor in the decoding system - besides the actual algorithm used - is the length of the recording window $T$. As cited in Chapter \ref{chapter:lit-review}, decoding accuracy almost always improved with increasing $T$. This is expected; longer time windows offer more samples to the decoding algorithm being used. However, the trade off is decreased information transfer rate (ITR) which results in a more sluggish BCI system. 
 
-Figures \ref{fig:gcca-acc-ns} and \ref{fig:mset-acc-ns} show the effect of varying $T$ on decoding accuracy for the GCCA and MsetCCA algorithms respectively. For each algorithm, the effect of varying $T$ is tested with four different calibration scenarios with $p=1,\dots,4$ where $p$ is the number of training or calibration trials. As expected, there is a monotonic increase in \textit{average} decoding accuracy (across stimulus frequencies for each trial) with increasing $T$. Clearly, there is also an interaction with the number of calibration trials $p$.
+Figures \ref{fig:gcca-acc-ns} and \ref{fig:mcca-acc-ns} show the effect of varying $T$ on decoding accuracy for the GCCA and MsetCCA algorithms respectively. For each algorithm, the effect of varying $T$ is tested with four different calibration scenarios with $p=1,\dots,4$ where $p$ is the number of training or calibration trials. As expected, there is a monotonic increase in \textit{average} decoding accuracy (across stimulus frequencies for each trial) with increasing $T$. 
+%Clearly, there is also an interaction with the number of calibration trials $p$.
 
 %% [SAMPLING LENGTH] Experiments with varying Ns: GCCA
 \begin{figure}[htp]
@@ -258,9 +259,9 @@ Figures \ref{fig:gcca-acc-nt} and \ref{fig:mset-acc-nt} show the effect of varyi
 \label{subsection:generalisation-testing}
 Of interest to template-based decoding algorithms that leverage historical `training' or calibration data is their ability to \textit{generalise} to new sets of data. In order to clarify this idea in context, consider two trial sessions $X_a$ and $X_b$ taken under \textit{different conditions} where the subject would have at least had to remove and reinstall the BCI headband on their head between sets. Thus, $X_a$ and $X_b$ would be recorded with slightly different electrode positions and contact impedances and would therefore exhibit different signal quality. 
 
-This experiment was thus designed to investigate whether calibration using data from one session, $X_a$ say, would allow generalise to another, say $X_b$. That is, would calibrating using $X_a$ and testing (validating) on $X_b$ yield comparable performance to calibrating and testing on data recorded from the same session as before? If so, the implication is that calibration would only need to be performed once-off, or at least, not \textit{every} recording session which would enhance the user experience. An extension of this experiment was to determine if calibrating using $X_a$ \textit{and} a small subset of $X_b$ and then testing on the remainder of $X_b$ would yield better performance than only calibrating on the subset of $X_b$ as in previous experiments.
+This experiment was thus designed to investigate whether calibration using data from one session, $X_a$, say, would allow generalise to another, say, $X_b$. That is, would calibrating using $X_a$ and testing (validating) on $X_b$ yield comparable performance to calibrating and testing on data recorded from the same session as in prior experiments? If so, the implication is that calibration would only need to be performed once-off, or at least, not \textit{every} recording session which would enhance the user experience. An extension of this experiment was to determine if calibrating using $X_a$ \textit{and} a small subset of $X_b$ and then testing on the remainder of $X_b$ would yield better performance than only calibrating on the subset of $X_b$ as in previous experiments.
 
-The results of such an experiment are shown in Figure \ref{fig:gt-results-gcca} and Figure \ref{fig:gt-results-mcca} for the GCCA and MsetCCA algorithms respectively. Continuing the analogy with $X_a$ and $X_b$ above, the number of `overlapping trials' in these figures refers to the number of trials from $X_b$ included in the calibration set along with the whole of $X_a$. Accordingly, 0 overlapping trials would correspond to a situation where calibration was performed exclusively on $X_a$ and testing on $X_b$. This condition tests the initial question in the experiment mentioned above. The case of $n$ overlapping trials with $x>1$ corresponds to calibration using all of $X_a$ \textit{and} $n$ trials from $X_b$ while still testing using the left-over\footnote{the set difference between all trials in $X_b$ and the $n$-element subset used for calibration.} trials from $X_b$. Calibration and `training`, as referred to in the figures, are used interchangeably here.
+The results of such an experiment are shown in Figure \ref{fig:gt-results-gcca} and Figure \ref{fig:gt-results-mcca} for the GCCA and MsetCCA algorithms respectively. Continuing the analogy with $X_a$ and $X_b$ above, the number of `overlapping trials' in these figures refers to the number of trials from $X_b$ included in the calibration set along with the whole of $X_a$. Accordingly, 0 overlapping trials would correspond to a situation where calibration was performed exclusively on $X_a$ and testing on $X_b$. This condition tests the initial question in the experiment mentioned above. The case of $n$ overlapping trials with $n>1$ corresponds to calibration using all of $X_a$ \textit{and} $n$ trials from $X_b$ while still testing using the left-over\footnote{the set difference between all trials in $X_b$ and the $n$-element subset used for calibration.} trials from $X_b$. Calibration and `training`, as referred to in the figures, are used interchangeably here.
 
 %% [GENERALISATION] Experiments with varying Ns: GCCA
 \begin{figure}[!htb]
@@ -292,8 +293,7 @@ The results of such an experiment are shown in Figure \ref{fig:gt-results-gcca} 
 \label{fig:gt-results-mcca}
 \end{figure}
 
-
-\begin{table}[]
+\begin{table}[!H]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllllllllllllll@{}}
@@ -371,7 +371,7 @@ $\boldsymbol{\sigma_f}^2$ &
   0.088 &
   0.051 &
   0.039 \\
-ITR &
+\textbf{ITR} &
   8.69 &
   18.70 &
   13.64 &
@@ -394,7 +394,7 @@ ITR &
 \label{tab:gcca-results}
 \end{table}
 
-\begin{table}[]
+\begin{table}[!htb]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllllllllllllll@{}}
@@ -490,32 +490,3 @@ $\boldsymbol{\sigma_f}^2$ &
 \caption[MsetCCA results summary: a compilation of decoding performance metrics for the MsetCCA algorithm.]{\textbf{MsetCCA results summary}: a compilation of decoding performance metrics for the MsetCCA algorithm. Results are reported over varying numbers of calibration trials $p$ and recording window lengths $T$ (in seconds). Average accuracy across frequency $\mathbf{\bar{x}}$ its standard error $\mathbf{s_{\bar{x}}}$ are reported in $\%$. \textbf{ITR} is given in bits/min. Accuracy variance over frequency $\boldsymbol{\sigma_f}^2$ is dimensionless.}
 \label{tab:mcca-results}
 \end{table}
-
-
-% \begin{figure}
-%      \centering
-%      \begin{subfigure}[b]{0.3\textwidth}
-%          \centering
-%          \includegraphics[width=\textwidth]{acc}
-%          \caption{$y=x$}
-%          \label{fig:y equals x}
-%      \end{subfigure}
-%      \hfill
-%      \begin{subfigure}[b]{0.3\textwidth}
-%          \centering
-%          \includegraphics[width=\textwidth]{graph2}
-%          \caption{$y=3sinx$}
-%          \label{fig:three sin x}
-%      \end{subfigure}
-%      \hfill
-%      \begin{subfigure}[b]{0.3\textwidth}
-%          \centering
-%          \includegraphics[width=\textwidth]{graph3}
-%          \caption{$y=5/x$}
-%          \label{fig:five over x}
-%      \end{subfigure}
-%         \caption{Three simple graphs}
-%         \label{fig:three graphs}
-% \end{figure}
-
-% \section{Experiments using Benchmark Data}

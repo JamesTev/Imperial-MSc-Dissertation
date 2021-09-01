@@ -9,8 +9,7 @@ Many, if not all, of the statistical decoding algorithms mentioned so far requir
 
 \subsection{Optimisation form I}
 \label{subsection:eig-opt-form-1}
-This form addresses constrained optimisation problems of the form
-
+The first form, which arises in the CCA algorithm, addresses constrained optimisation problems of the form
 \begin{equation}
 \begin{array}{ll}
 \underset{\vw}{\operatorname{maximize}} & \vw^{\top} \mA \vw \\
@@ -22,7 +21,7 @@ with variable $\vw \in \R^{d}$ and $\mA \in \R^{d\times d}$. Employing Lagrange 
 \begin{equation}
 \mathcal{L}=\vw^{\top} \boldsymbol{A} \vw-\lambda\left(\vw^{\top} \vw-1\right),
 \end{equation}
-with Lagrange multiplier $\lambda \in \R$ \cite{eig-tutorial}. Referencing the KKT conditions, \textit{stationary} requires $\frac{\partial \mathcal{L}}{\partial \vw} = 0$:
+with Lagrange multiplier $\lambda \in \R$ \cite{eig-tutorial}. Referencing the Karush-Kuhn-Tucker (KKT) conditions, \textit{stationary} requires $\frac{\partial \mathcal{L}}{\partial \vw} = 0$:
 \begin{equation}
 \mathbb{R}^{d} \ni \frac{\partial \mathcal{L}}{\partial \vw}=2 A \vw-2 \lambda \vw \stackrel{\text { set }}{=} 0 \Longrightarrow A \vw=\lambda \vw,
 \end{equation}
@@ -55,7 +54,7 @@ The diagonal elements of $\Lambda$ are the eigenvalues of $\mA$ and are arranged
 
 \subsection{Power iteration}
 \label{subsection:power-iteration-c3}
-The power iteration algorithm is a simple iterative algorithm used to find the eigenvector $\vq_1 \in \R^d$ corresponding to the largest eigenvalue of a matrix $A\in \R^{d\times d}$ \cite{panju-iterative-eig}. It relies on the property that if $\vq$ is an eigenvector of matrix $\mA$ with eigenvalue $\lambda$, then $\mA^k \vq = \lambda^k\vq, \quad k\in \mathbb{N}$. Let unit vector $\vv^{(0)} \in \R^d$ be the initial estimate of an eigenvector of $\mA$. Assuming that $\mA$ is full rank with real eigenvalues, its eigenvectors $\vq_i$ are orthogonal and form a basis for $\R^d$. Therefore, $\vv^{(0)}$ can be expressed as a linear combination of $\vq_i$:
+The power iteration algorithm is a simple iterative algorithm used to find the eigenvector $\vq_1 \in \R^d$ corresponding to the largest eigenvalue of a matrix $A\in \R^{d\times d}$ \cite{panju-iterative-eig}. It relies on the property that if $\vq$ is an eigenvector of matrix $\mA$ with eigenvalue $\lambda$, then $\mA^k \vq = \lambda^k\vq, \; k\in \mathbb{N}$. Let unit vector $\vv^{(0)} \in \R^d$ be the initial estimate of an eigenvector of $\mA$. Assuming that $\mA$ is full rank with real eigenvalues, its eigenvectors $\vq_i$ are orthogonal and form a basis for $\R^d$. Therefore, $\vv^{(0)}$ can be expressed as a linear combination of $\vq_i$:
 \begin{equation}
     \vv^{(0)} = \sum_{i=1}^{d} c_i\vq_i \quad \text{for} \quad c_i \in \R, \, \forall i
 \label{eq:power-iter-lin-sum}
@@ -98,7 +97,7 @@ If we let
 \begin{equation}
        \mV^{(k)} = \mA^{(k)}\mV^{(0)} = \left[\begin{array}{l|l|l}\vv_1^{(k)} & \dots & \vv_d^{(k)}\end{array}\right],
 \end{equation}
-the standard power iteration is effectively applied to all the vectors $\vv_1^{(0)}, \dots, \vv_d^{(0)}$ at once \cite{panju-iterative-eig}. However, in order to actually extract different eigenvectors from the set of distinct initial vectors (columns of $\mV$), we must orthonormalise the columns of $\mV^{(k)}$ at each iteration. This was done in the univariate version of the power iteration algorithm; the multivariate analogue is to ensure the set of eigenvector estimates (columns of $\mV^{(k)}$ are orthonormal in each iteration \cite{panju-iterative-eig}. This is achieved by using the QR decomposition of $\mV^{(k)}$ which decomposes a matrix into the product of an orthonormal matrix $\mQ$ and an upper triangular matrix $\mR$. In each iteration, a new matrix $\mW$ is obtained by multiplying $\mA$ by the latest eigenvector approximation matrix $\mV^{(k-1)}$. $\mW$ is updated to the orthonormal columns of $\mQ^{(k)}$ from the QR decomposition of $\mW^{(k-1)}$.
+the standard power iteration is effectively applied to all the vectors $\vv_1^{(0)}, \dots, \vv_d^{(0)}$ at once \cite{panju-iterative-eig}. However, in order to actually extract different eigenvectors from the set of distinct initial vectors (columns of $\mV$), we must orthonormalise the columns of $\mV^{(k)}$ at each iteration. This is done in the univariate version of the power iteration algorithm; the multivariate analogue is to ensure the set of eigenvector estimates (columns of $\mV^{(k)}$ are orthonormal in each iteration \cite{panju-iterative-eig}. This is achieved by using the QR decomposition of $\mV^{(k)}$ which decomposes a matrix into the product of an orthonormal matrix $\mQ$ and an upper triangular matrix $\mR$. In each iteration, a new matrix $\mW$ is obtained by multiplying $\mA$ by the latest eigenvector approximation matrix $\mV^{(k-1)}$. $\mW$ is updated to the orthonormal columns of $\mQ^{(k)}$ from the QR decomposition of $\mW^{(k-1)}$.
 
 \subsection{QR iteration algorithm}
 \label{subsection:qr-iteration}
@@ -268,7 +267,7 @@ Thus, $\mR$ is the inter-trial block covariance matrix which captures sub-covari
 After this training or calibration process is complete and $\mY_k$ is computed for all candidate frequencies $f_k$, these optimised reference sets can be used for inference. Given a new set of test signals $\hat{\mX} \in \R^{N_s \times N_c}$, ordinary CCA as in Section \ref{section:cca-c3} can be used to discern the frequency $f^*$ corresponding to the highest canonical correlation between $\hat{\mX}$ and the associated referenced set $\mY^*$. The process for finding $f^*$ is identical to that in (\ref{eq:cca-freq-discrimination}). The important difference here is how the pre-computed reference sets $\mY_k$ used in the CCA algorithm are calculated.
 
 \subsection{Generalised CCA (GCCA)}
-Consider a single candidate frequency $f_k$: for the rest of this subsection, the $k$ index is ommitted for brevity but all symbols refer to those specific to the single set of trials for $f_k$. As with MsetCCA, GCCA requires a signal tensor $\tX \in \R^{N_s \times N_c \times N_t}$ that incorporates several trials. The \textit{template matrix} $\overline{\mX}$ is obtained by computing the arithmetic mean of all trials in the set: $\overline{\mX}= \frac{1}{N_t}\sum_{i=1}^{N_t}\tX_{i}$. The concatenated signal matrix $\mX^{c}$ is formed by unrolling $\tX$ along the third (trial) axis:
+Consider a single candidate frequency $f_k$: for the rest of this subsection, the $k$ index is ommitted for brevity but all symbols refer to those specific to the single set of trials for a distinct stimulus frequency $f_k$. As with MsetCCA, GCCA requires a signal tensor $\tX \in \R^{N_s \times N_c \times N_t}$ that incorporates several trials. The \textit{template matrix} $\overline{\mX}$ is obtained by computing the arithmetic mean of all trials in the set: $\overline{\mX}= \frac{1}{N_t}\sum_{i=1}^{N_t}\tX_{i}$. The concatenated signal matrix $\mX^{c}$ is formed by unrolling $\tX$ along the third (trial) axis:
 \begin{equation}
     \mX^{c} = \begin{bmatrix}
     \mX_1^\top & \mX_2^\top & \dots & \mX_{N_t}^\top
@@ -285,9 +284,9 @@ $\mX^{c}$:
 \end{equation}
 where $\mY$ follows the definition of the sinusoidal reference in (\ref{eq:sinusoidal-ref}). Consider the augmented spatial filter vector $\widetilde{\vw}$: 
 \begin{equation}
-\widetilde{\vw} = \begin{bmatrix}\vw_{\mX^{c}} & \vw_{\overline{\mX}^{c}} & \vw_{\mY^{c}} \end{bmatrix}^\top 
+\widetilde{\vw} = \begin{bmatrix}\vw_{\mX^{c}} & \vw_{\overline{\mX}^{c}} & \vw_{\mY^{c}} \end{bmatrix}^\top,
 \end{equation}
-Similarly, the augmented signal matrix $\widetilde{\mX}$ is defined as: 
+where, for example, component weight $\vw_{\mX^{c}}$ corresponds to concatenated signal matrix $\mX^{c}$, and so on. Similarly, the augmented signal matrix $\widetilde{\mX}$ is defined as: 
 \begin{equation}
 \widetilde{\mX} = \begin{bmatrix}(\mX^{c})^\top & (\overline{\mX}^{c})^\top & (\mY^{c})^\top \end{bmatrix}^\top
 \end{equation}
@@ -324,7 +323,7 @@ Given a new test sample set $\hat{\mX} \in \R^{N_s\times N_c}$, two correlations
     \rho_1 &= \textrm{corr}(\hat{\mX}\vw_{\mX^{c}}, \; \overline{\mX}\vw_{\overline{\mX}^{c}}) \\
     \rho_2 &= \textrm{corr}(\hat{\mX}\vw_{\mX^{c}}, \; \mY\vw_{\mY^{c}}) 
 \end{align}
-where Pearson's correlation is denoted by \textit{corr}. Finally, the output correlation for frequency $f_k$ is computed as a combination of $\rho_1$ and $\rho_2$:
+where corr($.$) denotes Pearson correlation. Finally, the output correlation for frequency $f_k$ is computed as a combination of $\rho_1$ and $\rho_2$:
 \begin{equation}
     \rho = \textrm{sign}(\rho_1)\rho_1^2 + \textrm{sign}(\rho_2)\rho_2^2
 \end{equation}
