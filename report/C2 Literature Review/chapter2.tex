@@ -167,6 +167,7 @@ Welch's method is commonly used to reduce noise in PSD analysis. This approach i
 \label{subsection:psda-vs-cca}
 Many studies have demonstrated that PSDA can be used for SSVEP decoding/classification \cite{zhao-stimulus-layout-effect}, \cite{bci-survey-nicolas-alonso}, \cite{acampora-dataset}. However, it is widely documented that PSDA is inferior to more specialised statistical techniques that have been developed for this task: both in terms of signal classification accuracy and information transfer rate (ITR) \cite{autthasan-single-chan-ssvep}, \cite{lin-cca-2006}, \cite{sun-gcca}, \cite{zhang-mset-cca}, \cite{hakvoort-cca-psda-comparison}. The authors in \cite{hakvoort-cca-psda-comparison} performed a study specifically to compare the efficacy of PSDA vs statistical algorithms such as CCA (explored below) in EEG signal decoding. Their findings reinforce those of their colleagues in that CCA and its derivatives produce better decoding performance than PSDA.
 
+\newpage
 \subsection{Statistical}
 
 \subsubsection{Canonical correlation analysis (CCA)}
@@ -242,7 +243,7 @@ MsetCCA is one extension of standard CCA that takes into account historical data
 \label{subsection:gcca-c2}
 Wong \textit{et al} noted in their study of EEG spatial filtering methods in \cite{wong-spatial-filt} that using historical observations to estimate spatial filters (canonical weights) $\vw_i$ can be combined with harmonic reference signals as in ordinary CCA. Combining these techniques was found to enhance the algorithm's robustness and reduced calibration requirements \cite{wong-spatial-filt}.  Motivated by this, the authors in \cite{sun-gcca} developed a new algorithm called generalised CCA (GCCA) that aims to simultaneously maximise correlation between three sets of data: historical observations, measured signals in a new sample and the pre-constructed harmonic reference. As interpreted by the authors in \cite{sun-gcca}, the optimal spatial filters obtained through GCCA perform SSVEP signal denoising.
 
-\subsection{Data-driven and machine learning}
+% \subsection{Data-driven and machine learning}
 
 \section{Existing BCI Technology}
 \label{section:existing-bci-tech-c2}
