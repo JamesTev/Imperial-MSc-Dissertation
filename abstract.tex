@@ -1,9 +1,26 @@
 \noindent
+The cost of existing brain-computer interface (BCI) technologies makes them inaccessible to the general public and largely prohibits their use on a mass scale. This project details the development of a novel, ultra low-cost BCI prototype that can change this. It is hoped to facilitate public engagement and education in the domain of EEG sensing and other neurotechnologies, as well as improving advocacy an encouraging further research funding.
+\vspace{0.4cm}
 
-\begin{itemize}
-    \item why have have I done this?\footnote{good question :)}
-    \item what does it do
-    \item what are the results
-\end{itemize}
+\noindent
+In particular, this study presents the development of real time decoding and communication of raw EEG signals acquired from an ultra low-cost proprietary EEG-based BCI device developed by the \href{https://www.imperial.ac.uk/next-generation-neural-interfaces/}{Next Generation Neural Interfaces} (NGNI) Lab at Imperial College. It forms part of a broader project being coordinated by the NGNI Lab that will be presented in an exhibition hosted by the Royal Society. The BCI prototypes developed in this project will be worn by up to 100 different audience members at this exhibit and will serve to decode basic EEG signals concurrently and in real time in order to facilitate collaborative control in a multi-player game using only mental control.
+\vspace{0.4cm}
+
+\noindent
+This project was designed under challenging constraints, including: a budget of around 20 GBP (compared to the price of several hundred GBP for a typical BCI device), availability of only a single EEG channel and the limitation of dry surface electrodes. The steady state visual evoked potential (SSVEP) paradigm is used as the BCI control signal of choice owing to its simplicity of implementation, relatively high SNR achievable using basic BCI devices and the fact that it does not require any user training. Based on their wide-spread used in the field of EEG signal processing, decoding algorithms based on canonical correlation analysis (CCA) such as Multi-set CCA (MsetCCA) and Generalised CCA (GCCA) are explored most closely. Towards the objective of creating a low-cost but \textit{fully mobile} BCI, all operations necessary for signal acquisition, processing, decoding and communication are capable of running on the device itself. This functionality is fully implemented in the firmware of the electronic hardware provided by the NGNI Lab based on the ESP32 SoC by Espressif Systems. All firmware is implemented in Micropython, the cross-architecture Python compiler and runtime for microcontrollers that runs on bare-metal.
+\vspace{0.4cm}
+
+\noindent
+Subject to performing a short calibration sequence each time the BCI is put on, optimal results show that decoding accuracy of $95.56 \pm 3.74\%$ with an information transfer rate (ITR) of $102$ bits/min ($p=4$ calibration trials of $T=0.75$s each) can be achieved by the MsetCCA algorithm. With more modest calibration requirements ($p=2$ calibration trials of $T=1$s each), accuracy of $80.56 \pm 4.46\%$ with an ITR of $40$ bits/min can be achieved using the same algorithm.
+\vspace{0.4cm}
+
+\noindent
+
+
+% \begin{itemize}
+%     \item why have have I done this?\footnote{good question :)}
+%     \item what does it do
+%     \item what are the results
+% \end{itemize}
 
 

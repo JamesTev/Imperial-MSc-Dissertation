@@ -2,13 +2,17 @@
 \label{chapter:conclusion}
 
 \section{Conclusion}
+Over the course of this project, an ultra low-cost, fully self-contained BCI prototype was developed. The research questions posed in Section \ref{section:research-questions} have been addressed:
+\begin{enumerate}
+    \item An ultra low-cost BCI device can be used for the purpose of decoding basic EEG signals such as SSVEPs in real time. Subject to performing a short calibration sequence each time the BCI is put on, decoding accuracy of $95.56 \pm 3.74\%$ with an ITR of $102$ bits/min ($p=4, \, T=0.75$s). With more modest calibration requirements ($p=2, \, T=1$s), accuracy of $80.56 \pm 4.46\%$ with an ITR of $40$ bits/min can be achieved.
+    \item The device can achieve the aforementioned performance when performing \textit{all} operations necessary to do so on the device itself. No computational or other outsourcing is required.
+\end{enumerate}
+The results presented in Chapter \ref{chapter:results} demonstrate that the DSP system, coupled with the decoding algorithms used, proved very effective for SSVEP decoding. It can be concluded that, of the applicable algorithms explored, MsetCCA offers superior performance in terms of accuracy, ITR and robustness. While the results in this study are somewhat limited due to the fact that data was only collected from a single subject, they nonetheless present an encouraging proof-of-concept for further, more stringent investigation. 
+
+At the time of writing, to the best of the author's knowledge, there are no fully mobile, self-contained BCI devices in the price range of around £20. Furthermore, unlike many existing research devices that use proprietary software or other tools, this prototype was developed using exclusively open source software. As a result, this project presents an exciting prospect for further research and development as it could become a valuable tool for education and public engagement. 
 
 \section{Future work}
 While the system developed in this project performed remarkably well considering the constraints imposed on it, there are several areas for improvement. The following observations and suggestions are made for future extensions of this project. 
-% Evaluate if objectives initially laid out were achieved
-% - if not, why not
-% - if they had been stated differently/more realistically, would the outcome have been different?
-% - what would need to be done differently next time
 
 \subsubsection{Multi-channel sensing}
 As mentioned in the prior discussion, the limitation of only having one active EEG channel was significant. It is firmly believed that introducing addition channels would significantly improve decoding performance. Furthermore, it is conceivable that the existing electronic hardware in this project could be adapted for multi-channel support by using a multi-channel analogue frontend (as is used on the OpenBCI Ganglion board, for example). The ESP32 SoC also has several available ADC inputs.
